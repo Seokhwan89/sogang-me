@@ -41,4 +41,4 @@ npm install && npm run dev   # http://localhost:3000
 - 타 서버 이전: Supabase는 표준 PostgreSQL이라 `pg_dump` 로 전량 추출 가능 (Database → Backups)
 
 ## 비용
-Vercel Hobby(무료) + Supabase Free(DB 500MB, 저장소 1GB)로 학과 홈페이지 트래픽은 충분합니다. 저장소가 부족해지면 Supabase Pro($25/월)로 전환.
+Vercel Hobby(무료) + Supabase Free(DB 500MB, 저장소 1GB)로 학과 홈페이지 트래픽은 충분합니다. 저장소가 부족해지면 Supabase Pro($25/월)로 전환..
