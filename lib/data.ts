@@ -26,7 +26,7 @@ export async function getHomeData() {
 
 export async function getPosts(board: string, page = 1, per = 15, q = '') {
   const sb = createPublicClient();
-  let query = sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,created_at,is_pinned,view_count,author,attachments', { count: 'exact' })
+  let query = sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,created_at,is_pinned,view_count,author,attachments,video_url,term,members,advisor,category,sort_order', { count: 'exact' })
     .eq('board', board).eq('published', true);
   if (q) query = query.or(`title_ko.ilike.%${q}%,title_en.ilike.%${q}%,content_ko.ilike.%${q}%`);
   const from = (page - 1) * per;
