@@ -2,6 +2,7 @@ import PageHero from '@/components/PageHero';
 import { getFacultyOne } from '@/lib/data';
 import { t, T, type Locale } from '@/lib/i18n';
 import { areas } from '@/content/areas';
+import { researchGroupDefs } from '@/lib/groups';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { toHtml } from '@/lib/html';
@@ -24,6 +25,7 @@ export default async function FacultyDetail({ params }: { params: { locale: Loca
           {f.office && <div><dt className="eyebrow">{T(l, 'office')}</dt><dd className="mt-1">{f.office}</dd></div>}
           {f.tel && <div><dt className="eyebrow">{T(l, 'tel')}</dt><dd className="mt-1 font-mono">{f.tel}</dd></div>}
           {f.email && <div><dt className="eyebrow">{T(l, 'email')}</dt><dd className="mt-1"><a href={`mailto:${f.email}`} className="hover:text-sg-red">{f.email}</a></dd></div>}
+          {Array.isArray(f.groups) && f.groups.length > 0 && <div><dt className="eyebrow">{ko ? '융합연구 그룹' : 'Research groups'}</dt><dd className="mt-1 flex flex-wrap gap-1.5">{f.groups.map((g: string) => { const d = researchGroupDefs.find((x) => x.id === g); return d ? <Link key={g} href={`/${l}/graduate/groups`} className="text-[12.5px] px-2 py-0.5 bg-sg-mist border border-sg-line hover:border-sg-ink">{ko ? d.ko : d.en}</Link> : null; })}</dd></div>}
           {f.lab_url && <div><dt className="eyebrow">{T(l, 'website')}</dt><dd className="mt-1"><a href={f.lab_url} target="_blank" rel="noreferrer" className="text-sg-red underline underline-offset-4 break-all">{f.lab_url.replace(/^https?:\/\//, '')}</a></dd></div>}
         </dl>
       </aside>

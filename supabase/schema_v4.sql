@@ -1,0 +1,21 @@
+-- v4: faculty.groups (융합·응용연구 그룹) — 교수 정보만 고치면 관련 페이지가 자동 반영됩니다
+alter table faculty add column if not exists groups jsonb default '[]'::jsonb;
+update faculty set groups = '["bio", "energy", "micronano"]'::jsonb where name_ko = '강성민';
+update faculty set groups = '["fluid"]'::jsonb where name_ko = '강성원';
+update faculty set groups = '["bio", "fluid"]'::jsonb where name_ko = '김남근';
+update faculty set groups = '["bio", "fluid", "manufacturing"]'::jsonb where name_ko = '김남중';
+update faculty set groups = '["energy"]'::jsonb where name_ko = '김대중';
+update faculty set groups = '["fluid", "automotive"]'::jsonb where name_ko = '김동철';
+update faculty set groups = '["fluid", "micronano", "manufacturing"]'::jsonb where name_ko = '김상엽';
+update faculty set groups = '["bio", "micronano"]'::jsonb where name_ko = '박정열';
+update faculty set groups = '["fluid", "energy"]'::jsonb where name_ko = '손기헌';
+update faculty set groups = '["bio", "energy", "micronano"]'::jsonb where name_ko = '송지환';
+update faculty set groups = '["bio"]'::jsonb where name_ko = '신충수';
+update faculty set groups = '["bio", "mechatronics"]'::jsonb where name_ko = '이승엽';
+update faculty set groups = '["mechatronics"]'::jsonb where name_ko = '전도영';
+update faculty set groups = '["bio", "micronano"]'::jsonb where name_ko = '정봉근';
+update faculty set groups = '["bio", "mechatronics"]'::jsonb where name_ko = '정석환';
+update faculty set groups = '["energy", "micronano"]'::jsonb where name_ko = '정헌재';
+update faculty set groups = '["bio", "fluid", "mechatronics", "automotive"]'::jsonb where name_ko = '정현용';
+update faculty set groups = '["bio", "fluid", "micronano"]'::jsonb where name_ko = '최은표';
+select name_ko, field, groups from faculty where is_emeritus = false order by sort_order;

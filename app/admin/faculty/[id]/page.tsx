@@ -4,6 +4,7 @@ import HtmlEditor from '@/components/admin/HtmlEditor';
 import TranslateButton from '@/components/admin/TranslateButton';
 import PhotoField from '@/components/admin/PhotoField';
 import { areas } from '@/content/areas';
+import { researchGroupDefs } from '@/lib/groups';
 import { notFound } from 'next/navigation';
 
 export default async function EditFaculty({ params }: { params: { id: string } }) {
@@ -26,6 +27,13 @@ export default async function EditFaculty({ params }: { params: { id: string } }
           <label className="block text-[13px]">연구 분야<select name="field" defaultValue={f?.field || ''} className="input mt-1"><option value="">—</option>{areas.map((a) => <option key={a.id} value={a.id}>{a.ko}</option>)}</select></label>
           <I n="sort_order" l="정렬 순서 (작을수록 앞)" v={String(f?.sort_order ?? 100)} />
         </div>
+      </div>
+      <div className="border border-sg-cardinal/30 bg-sg-cardinal/5 p-4">
+        <p className="text-[13px] font-semibold">소속 연구그룹 <span className="font-normal text-sg-steel">— 체크한 그룹의 「대학원과정 › 융합 및 응용연구 그룹」 페이지에 자동으로 표시됩니다 (중복 선택 가능)</span></p>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 text-[13px]">
+          {researchGroupDefs.map((g) => <label key={g.id} className="flex items-center gap-2"><input type="checkbox" name={`group_${g.id}`} defaultChecked={Array.isArray(f?.groups) && f.groups.includes(g.id)} /> {g.ko}</label>)}
+        </div>
+        <p className="mt-2 text-[12px] text-sg-steel">※ 위 "연구 분야"(4개 기초전공분야)는 「기초전공분야」 페이지의 연구실 표에 자동 반영됩니다. 퇴직 시에는 아래 "명예교수"를 체크하면 모든 목록에서 자동으로 이동합니다.</p>
       </div>
       <div><p className="text-[13px] mb-1">연구분야 소개 (한국어, HTML)</p><HtmlEditor name="research_ko" defaultValue={f?.research_ko || ''} folder="faculty" rows={8} /></div>
       <div><p className="text-[13px] mb-1">Research (English)</p><HtmlEditor name="research_en" defaultValue={f?.research_en || ''} folder="faculty" rows={6} /></div>

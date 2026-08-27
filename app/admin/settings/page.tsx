@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase-server';
 import { saveSettings, addAdmin } from '@/app/admin/actions';
 import TranslateAll from '@/components/admin/TranslateAll';
+import TranslateAll from '@/components/admin/TranslateAll';
 export default async function Settings() {
   const sb = createClient();
   const { data } = await sb.from('site_settings').select('value').eq('key', 'home').maybeSingle();
@@ -26,7 +27,8 @@ export default async function Settings() {
       <p className="text-[12px] text-sg-steel">메인 노출 여부는 각 게시글 편집 화면의 "메인 페이지에 노출" 체크로 개별 제어됩니다.</p>
       <button className="btn-primary">저장</button>
     </form>
-        <h2 className="mt-10 font-bold">영문 번역</h2>
+    <div className="mt-10"><TranslateAll initialRemaining={missing || 0} /></div>
+    <h2 className="mt-10 font-bold">영문 번역</h2>
     <div className="mt-3 max-w-2xl"><TranslateAll /></div>
     <h2 className="mt-10 font-bold">관리자 계정</h2>
     <p className="text-[13px] text-sg-steel mt-1">Supabase → Authentication → Users 에서 계정을 만든 뒤, 아래에 같은 이메일을 등록하면 관리 권한이 부여됩니다.</p>

@@ -1,58 +1,25 @@
 import type { PageContent } from './types';
 
-const lab = (ko: string, en: string, url: string | null, prof: string, profEn: string, room: string, tel: string) => ({ ko, en, url, prof, profEn, room, tel });
-
 export const researchAreas = [
   { id: 'design', ko: '설계 및 재료역학 분야', en: 'Design & Materials Mechanics',
     descKo: '기계부품이나 구조를 설계하고 그 수명(내구성), 안전성 및 신뢰도를 해석하고 예측하며 실험과 계산을 통하여 이를 검증하는 분야로 네 개의 연구실로 구성되어 있습니다.',
     descEn: 'Designs machine components and structures, analyzes and predicts their life, safety and reliability, and verifies them through experiment and computation. Four laboratories.',
-    labs: [
-      lab('자동차 메카트로닉스 및 바이오 역학 연구실', 'Automotive Mechatronics & Bio Mechanics Laboratory', 'https://ambmlab.sogang.ac.kr', '정현용', 'Hyun-Yong Jeong', 'R619', '712-2474'),
-      lab('생체역학 & 의공학 연구실', 'Sogang Biomechanics and Biomedical Engineering Laboratory', 'https://biome.sogang.ac.kr', '신충수', 'Choongsoo Shin', 'AS610', '705-8825'),
-      lab('응용역학 및 설계 연구실', 'Applied Mechanics & Design Laboratory', 'https://amdl.sogang.ac.kr', '김남근', 'Namkeun Kim', 'AS611', '705-8792'),
-      lab('물리 및 AI 기반 지능설계 연구실', 'Physics-AI Intelligent Design Laboratory', 'https://sites.google.com/view/namjungk', '김남중', 'Namjung Kim', 'CY313', '705-8633'),
-    ] },
+  },
   { id: 'thermal', ko: '열, 유체 및 에너지 분야', en: 'Thermal, Fluids & Energy',
     descKo: '에너지가 어떻게 변환되고, 유체가 어떻게 흐르며, 열이 어떻게 전달되는지를 탐구하는 학문입니다. 전기자동차·드론·로봇에 들어가는 고출력 이차전지, 반도체 공정의 정밀 세정 기술, 그리고 AI 시대의 핵심 인프라인 데이터센터의 냉각 시스템까지 첨단 기술의 한복판에는 언제나 열과 유체의 문제가 자리하고 있습니다. 최근에는 전산유체역학과 전산열전달, AI 기반 설계 및 공정 최적화를 적극 활용하여 차세대 에너지 시스템과 열관리 기술의 혁신을 이끄는 융합 연구로 영역을 넓혀가고 있습니다. 다섯 개의 연구실이 시뮬레이션과 실험을 아울러 이론·전산·실험을 폭넓게 경험할 수 있는 환경을 제공합니다.',
     descEn: 'Studies how energy is converted, how fluids flow and how heat is transferred — from high-power batteries in EVs, drones and robots, to precision cleaning in semiconductor fabs and cooling for AI data centers. Increasingly uses CFD, computational heat transfer and AI-based design and process optimization to drive next-generation energy and thermal-management systems. Five laboratories spanning simulation and experiment.',
     courses: '열역학I, 유체역학I, 열역학II, 자동차동력공학, 유체역학II, 열전달, 냉동 및 공기조화, 신재생에너지공학개론, 미소열유체역학, 열유체시스템설계, 전산유체역학, 연료전지개론, 미소열유체공학, 연소및물질전달, 전산열전달, 통계열역학 및 미소열전달, 고급열전달',
-    labs: [
-      lab('다상 열전달 연구실', 'Sogang Multiphase Heat Transfer Laboratory', 'https://htlab.sogang.ac.kr', '손기헌', 'Gihun Son', 'R621', '701-8683'),
-      lab('에너지-워터 넥서스 연구실', 'Sogang Energy-Water Nexus (SEWN) Laboratory', 'https://energy.sogang.ac.kr', '김대중', 'Daejoong Kim', 'R616', '715-8825'),
-      lab('열유체 다중현상 연구실', 'Fluid and Thermal Multiphysics Laboratory', 'https://ftmlab.sogang.ac.kr', '강성원', 'Sungwon Kang', 'AS708', '705-7972'),
-      lab('지능형 바이오메디컬 마이크로유체 연구실', 'Intelligent Biomedical Microfluidics Laboratory', 'https://sites.google.com/view/choi-ibml/home', '최은표', 'Eunpyo Choi', 'AS607', '705-8824'),
-      lab('재료설계 및 공정공학 연구실', 'Materials Design and Process Engineering Laboratory', 'https://mdpel.sogang.ac.kr', '정헌재', 'Hunjae Jeong', 'RA405', '705-8636'),
-    ] },
+  },
   { id: 'control', ko: '제어, 진동, 로보틱스 분야', en: 'Control, Vibration & Robotics',
     descKo: '로봇, 컴퓨터 수치제어식 공작기계, 메카트로닉스 시스템 등을 해석하고 고속·고정밀 움직임을 위한 제어기 및 자동차, 항공기, 로봇 및 기계류의 진동현상을 해석하고 이를 최소화하기 위한 설계 및 능동 제어를 연구합니다. 또한 바이오 응용 연구로 다양한 생체 모방 로봇 및 센서, 액츄에이터를 개발하는 연구 및 의공학 응용 바이오 시스템 및 매니퓰레이션 관련 연구를 새롭게 시작하고 있습니다.',
     descEn: 'Analyzes robots, CNC machine tools and mechatronic systems; develops controllers for high-speed, high-precision motion; analyzes and actively suppresses vibration in vehicles, aircraft, robots and machinery. Also develops biomimetic robots, sensors and actuators, and biomedical manipulation systems.',
-    labs: [
-      lab('정밀제어 및 인간메카트로닉스 연구실', 'Precision Control & Human Mechatronics Laboratory', 'https://biomecha.sogang.ac.kr', '전도영', 'Doyoung Jeon', 'R614', '705-8634'),
-      lab('바이오모방 및 정밀기기 연구실', 'Biomimetics and Precision Device Laboratory', 'https://ispdl.sogang.ac.kr', '이승엽', 'Seung-Yop Lee', 'AS407', '706-8280'),
-      lab('나노바이오시스템 및 매니퓰레이션 연구실', 'NanoBiosystems and Manipulation Laboratory', 'https://nbsm.sogang.ac.kr', '박정열', 'Jungyul Park', 'AS707', '701-7075'),
-      lab('로봇공학 및 지능형 메커니즘 연구실', 'Robotics and Intelligent Mechanisms Laboratory', 'https://rim.sogang.ac.kr', '정석환', 'Seokhwan Jeong', 'K236', '705-7886'),
-    ] },
+  },
   { id: 'manufacturing', ko: '생산공학 분야', en: 'Manufacturing Engineering',
     descKo: '기계장치 및 제품을 생산하는 기술 및 배경학문의 모임으로서 전통재료 및 첨단 재료의 가공과 설계, 최신의 미소가공(micro-mechanics), 초정밀 가공 및 레이저가공과 같은 특수 가공이 포함됩니다. 최근에는 나노 공정 및 나노 구조물의 자기조립과 관련된 연구를 수행하고 있으며, 생산·조립·공정 자동화를 위하여 인공지능(AI), 전문가 시스템 등을 활용하는 분야로 다섯 개의 연구실로 구성되어 있습니다.',
     descEn: 'The technologies and sciences of producing machines and products: processing and design of conventional and advanced materials, micro-mechanics, ultra-precision and laser machining, nano-processes and self-assembly of nanostructures, and AI and expert systems for production and assembly automation. Five laboratories.',
-    labs: [
-      lab('다중물리 & 다중스케일 시스템 연구실', 'Multiphysics & Multiscale Systems Laboratory', 'https://mmslab.sogang.ac.kr', '김동철', 'Dongchoul Kim', 'AS701', '705-8643'),
-      lab('바이오나노공학기술 연구실', 'BioNano Technology Laboratory', 'https://bntl.sogang.ac.kr', '정봉근', 'Bong Geun Chung', 'R617', '705-8823'),
-      lab('복합재료지능 연구실', 'Composite Intelligence Laboratory', 'https://composite.sogang.ac.kr', '김상엽', 'Sang-Yup Kim', 'F601', '705-7967'),
-      lab('멀티스케일 융합기술 연구실', 'Multiscale Convergence Technology Laboratory', 'https://mctl.sogang.ac.kr', '강성민', 'Sungmin Kang', 'AS601', '705-8632'),
-      lab('지능형 융합설계 연구실', 'INtelligent & COnvergent DEsign Laboratory', 'https://incode.sogang.ac.kr', '송지환', 'Jihwan Song', 'AS613', '705-8639'),
-    ] },
+  },
 ];
 
-export const researchGroups = [
-  { ko: '바이오공학 연구그룹', en: 'Bioengineering Group', profs: ['신충수', '박정열', '정현용', '이승엽', '정봉근', '정석환', '김남근', '강성민', '최은표', '송지환', '김남중'] },
-  { ko: '유체 및 복합체 연구그룹', en: 'Fluids & Composites Group', profs: ['손기헌', '정현용', '김동철', '강성원', '김상엽', '김남근', '최은표', '김남중'] },
-  { ko: '에너지공학 연구그룹', en: 'Energy Engineering Group', profs: ['김대중', '손기헌', '강성민', '송지환', '정헌재'] },
-  { ko: '메카트로닉 시스템 연구그룹', en: 'Mechatronic Systems Group', profs: ['전도영', '정현용', '이승엽', '정석환'] },
-  { ko: '마이크로/나노 시스템 연구그룹', en: 'Micro/Nano Systems Group', profs: ['박정열', '정봉근', '김상엽', '강성민', '최은표', '송지환', '정헌재'] },
-  { ko: '고급가공기술 연구그룹', en: 'Advanced Manufacturing Group', profs: ['김상엽', '김남중'] },
-  { ko: '자동차공학 연구그룹', en: 'Automotive Engineering Group', profs: ['정현용', '김동철'] },
-];
 
 export const graduate: Record<string, PageContent> = {
   'graduate/admission': {
