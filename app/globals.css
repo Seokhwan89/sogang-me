@@ -70,3 +70,11 @@ body { @apply bg-sg-paper text-sg-ink font-sans antialiased; word-break: keep-al
 .floaty { animation: floaty 5s ease-in-out infinite; }
 @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
 .marquee { animation: marquee 40s linear infinite; }
+
+/* 관리자 리치 에디터 */
+.ProseMirror { outline: none; }
+.ProseMirror table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.ProseMirror th, .ProseMirror td { border: 1px solid var(--sg-line); padding: 8px 10px; vertical-align: top; }
+.ProseMirror th { background: var(--sg-mist); font-weight: 600; }
+.ProseMirror .selectedCell { background: rgba(175,39,47,.08); }
+.ProseMirror p.is-editor-empty:first-child::before { content: '여기에 내용을 입력하세요'; color: var(--sg-gray5); float: left; height: 0; pointer-events: none; }

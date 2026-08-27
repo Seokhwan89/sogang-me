@@ -7,6 +7,7 @@ import { researchAreas } from '@/content/pages-grad';
 import { researchGroupDefs } from '@/lib/groups';
 import { getFaculty } from '@/lib/data';
 import { areas } from '@/content/areas';
+import { formatOffice } from '@/lib/buildings';
 import type { Locale } from '@/lib/i18n';
 import { notFound } from 'next/navigation';
 export const revalidate = 300;
@@ -48,7 +49,7 @@ export default async function Grad({ params }: { params: { locale: Locale; slug:
                             <span className="block text-[12.5px] text-sg-gray9">{ko ? f.lab_en : f.lab_ko}</span>
                           </td>
                           <td className="py-3 pr-3 whitespace-nowrap"><Link href={`/${l}/faculty/${f.id}`} className="hover:text-sg-cardinal">{ko ? f.name_ko : f.name_en || f.name_ko}</Link></td>
-                          <td className="py-3 pr-3 text-[13.5px]">{f.office}</td>
+                          <td className="py-3 pr-3 text-[13.5px]">{formatOffice(f, ko)}</td>
                           <td className="py-3 text-[13.5px]">{f.tel}</td>
                         </tr>
                       ))}
@@ -85,7 +86,7 @@ export default async function Grad({ params }: { params: { locale: Locale; slug:
                     {members.map((f: any) => (
                       <li key={f.id} className="text-[14.5px]">
                         <Link href={`/${l}/faculty/${f.id}`} className="font-semibold hover:text-sg-cardinal">{ko ? f.name_ko : f.name_en || f.name_ko}</Link>
-                        <span className="block text-[13px] text-sg-gray11">{ko ? f.lab_ko : f.lab_en || f.lab_ko}{f.office ? ` · ${f.office}` : ''}</span>
+                        <span className="block text-[13px] text-sg-gray11">{ko ? f.lab_ko : f.lab_en || f.lab_ko}{formatOffice(f, ko) ? ` · ${formatOffice(f, ko)}` : ''}</span>
                       </li>
                     ))}
                   </ul>

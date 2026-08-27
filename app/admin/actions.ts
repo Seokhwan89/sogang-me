@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-server';
 import { translateKoToEn } from '@/lib/translate';
 import { toHtml } from '@/lib/html';
 import { researchGroupDefs } from '@/lib/groups';
+import { buildingOf } from '@/lib/buildings';
 
 import { adminBase as base } from '@/lib/admin';
 
@@ -70,7 +71,10 @@ export async function deletePost(fd: FormData) {
 export async function saveFaculty(fd: FormData) {
   const sb = await admin(); const id = str(fd, 'id');
   const row: any = {};
-  for (const k of ['name_ko', 'name_en', 'title_ko', 'title_en', 'email', 'tel', 'lab_ko', 'lab_en', 'lab_url', 'office', 'photo_url', 'field', 'research_ko', 'research_en', 'bio_ko', 'bio_en']) row[k] = nul(str(fd, k));
+  for (const k of ['name_ko', 'name_en', 'title_ko', 'title_en', 'email', 'tel', 'lab_ko', 'lab_en', 'lab_url', 'photo_url', 'field', 'research_ko', 'research_en', 'bio_ko', 'bio_en']) row[k] = nul(str(fd, k));
+  row.building = nul(str(fd, 'building')); row.room = nul(str(fd, 'room'));
+  const bdg = buildingOf(row.building);
+  row.office = bdg ? (row.room ? `${bdg.ko}(${bdg.code}) ${row.room}호` : `${bdg.ko}(${bdg.code})`) : null;
   row.name_ko = str(fd, 'name_ko'); row.sort_order = Number(str(fd, 'sort_order') || 100);
   row.is_emeritus = bool(fd, 'is_emeritus'); row.published = bool(fd, 'published');
   row.groups = researchGroupDefs.filter((g) => bool(fd, `group_${g.id}`)).map((g) => g.id);

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import HtmlEditor from './HtmlEditor';
+import RichEditor from './RichEditor';
 import Uploader from './Uploader';
 import TranslateButton from './TranslateButton';
 import { boards, festivalCategories } from '@/lib/nav';
@@ -38,10 +38,10 @@ export default function PostForm({ post, defaultBoard }: { post?: any; defaultBo
       <label className="block text-[13px]">YouTube 주소 <span className="text-sg-steel">(선택 — 입력하면 본문 위에 영상이 표시되고, 카드 썸네일로도 사용)</span><input name="video_url" defaultValue={post?.video_url || ''} placeholder="https://youtu.be/xxxxx 또는 https://www.youtube.com/watch?v=xxxxx" className="input mt-1" /></label>
       <label className="block text-[13px]">제목 (한국어) *<input name="title_ko" required defaultValue={post?.title_ko} className="input mt-1 !text-base" /></label>
       <label className="block text-[13px]">Title (English)<input name="title_en" value={enTitle} onChange={(e) => setEnTitle(e.target.value)} className="input mt-1" placeholder="비워두면 저장 시 자동 번역(설정 시)" /></label>
-      <div><p className="text-[13px] mb-1">본문 (한국어) <span className="text-sg-steel">— 일반 글처럼 입력하세요. Enter로 줄바꿈, 빈 줄로 문단 구분이 그대로 반영됩니다. 표·제목 등은 툴바 사용.</span></p><HtmlEditor name="content_ko" defaultValue={post?.content_ko || ''} /></div>
+      <div><p className="text-[13px] mb-1">본문 (한국어) <span className="text-sg-steel">— 워드처럼 입력하세요. 위 버튼으로 제목·목록·표·사진·링크를 넣을 수 있습니다.</span></p><RichEditor name="content_ko" defaultValue={post?.content_ko || ''} /></div>
       <details className="border border-sg-line bg-white p-3" open={!!post?.content_en}>
         <summary className="text-[13px] cursor-pointer">Content (English) — {post?.content_en ? '있음' : '없음 · 자동 번역 대상'}</summary>
-        <div className="mt-3"><HtmlEditor name="content_en" defaultValue={post?.content_en || ''} rows={12} /></div>
+        <div className="mt-3"><RichEditor name="content_en" defaultValue={post?.content_en || ''} minHeight={264} /></div>
       </details>
       <div className="flex flex-wrap gap-3 items-center">
         <TranslateButton pairs={[['title_ko', 'title_en'], ['content_ko', 'content_en']]} />

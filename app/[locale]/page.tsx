@@ -74,10 +74,10 @@ export default async function Home({ params }: { params: { locale: Locale } }) {
             <h2 className="h-section mt-3">{ko ? '기계공학의 네 기둥, 그 위에서 만나는 융합' : 'Four pillars of mechanical engineering, converging'}</h2>
             <p className="mt-4 text-[17px] text-sg-gray11 leading-relaxed">{ko ? '설계·재료역학, 열·유체·에너지, 제어·진동·로보틱스, 생산공학. 기초 분야의 깊이 위에 바이오·에너지·모빌리티·마이크로나노 융합 연구가 자랍니다.' : 'Depth in four foundations grows into convergence research in bio, energy, mobility and micro/nano systems.'}</p>
           </Reveal>
-          <div className="mt-12 grid gap-5 md:grid-cols-2">
+          <div className="mt-12 grid gap-5 md:grid-cols-2 items-stretch">
             {areas.map((a, i) => { const E = emblemOf[a.id]; return (
-              <Reveal key={a.id} delay={i * 90}>
-                <Link href={`/${l}/graduate/areas#${a.id}`} className="group relative block overflow-hidden bg-sg-ink text-white min-h-[300px] p-8 md:p-10">
+              <Reveal key={a.id} delay={i * 90} className="h-full">
+                <Link href={`/${l}/graduate/areas#${a.id}`} className="group relative flex h-full min-h-[340px] flex-col overflow-hidden bg-sg-ink text-white p-8 md:p-10">
                   <div className="absolute inset-0 opacity-90" style={{ background: `linear-gradient(135deg, ${a.color} 0%, #1a1a1a 85%)` }} />
                   <div className="absolute inset-0 opacity-[.12]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #fff 1px, transparent 0)', backgroundSize: '22px 22px' }} />
                   <div className="absolute right-4 bottom-2 w-[260px] md:w-[320px] opacity-90 transition-transform duration-700 group-hover:scale-105"><E className="w-full h-auto text-white" /></div>
@@ -86,7 +86,7 @@ export default async function Home({ params }: { params: { locale: Locale } }) {
                     <h3 className="mt-2 font-brand text-[1.9rem] md:text-[2.3rem] leading-tight">{ko ? a.ko : a.en}</h3>
                     <p className="mt-4 text-[15px] leading-relaxed text-white/85">{ko ? a.descKo : a.descEn}</p>
                     <ul className="mt-5 flex flex-wrap gap-2">{(ko ? a.keywordsKo : a.keywordsEn).map((k) => <li key={k} className="text-[12.5px] px-2.5 py-1 bg-white/12 border border-white/20 rounded-full">{k}</li>)}</ul>
-                    <span className="mt-6 inline-flex items-center gap-2 text-[14px] font-semibold">{ko ? '연구실 보기' : 'Explore labs'} <span className="transition-transform group-hover:translate-x-1">→</span></span>
+                    <span className="mt-auto pt-6 inline-flex items-center gap-2 text-[14px] font-semibold">{ko ? '연구실 보기' : 'Explore labs'} <span className="transition-transform group-hover:translate-x-1">→</span></span>
                   </div>
                 </Link>
               </Reveal>

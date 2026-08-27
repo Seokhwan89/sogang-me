@@ -7,7 +7,7 @@ export type Post = {
   id: number; board: string; title_ko: string; title_en?: string | null; excerpt_ko?: string | null; excerpt_en?: string | null;
   thumbnail_url?: string | null; created_at: string; is_pinned?: boolean; view_count?: number; author?: string | null;
   content_ko?: string | null; content_en?: string | null; attachments?: any[]; images?: any[];
-  video_url?: string | null; term?: string | null; members?: string | null; advisor?: string | null; category?: string | null; sort_order?: number | null;
+  video_url?: string | null; term?: string | null; members?: string | null; advisor?: string | null; category?: string | null; category_en?: string | null; sort_order?: number | null;
 };
 
 export const fmtDate = (d: string) => new Date(d).toISOString().slice(0, 10).replace(/-/g, '.');

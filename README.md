@@ -81,4 +81,11 @@ Supabase SQL Editor에서 `supabase/schema_v3.sql` → `supabase/seed_v3.sql` �
 ### 아직 코드로 관리하는 항목 (의도적)
 - 4개 기초전공분야 이름·설명, 7개 연구그룹 이름 (`content/pages-grad.ts`, `lib/groups.ts`)
 - 학사일정 (`content/pages-ug.ts`의 `calendar2026`) — 매년 갱신 시 요청
-- 메뉴 구조·게시판 목록 (`lib/nav.ts`), 화면 문구 (`lib/i18n.ts`).
+- 메뉴 구조·게시판 목록 (`lib/nav.ts`), 화면 문구 (`lib/i18n.ts`)
+
+## v6 (2026-08-27) 관리 편의 개선
+- **본문 편집기 교체**: HTML 대신 워드처럼 쓰는 편집기(TipTap). 제목·목록·표·사진·링크 버튼 제공, 표는 행/열 추가·삭제 가능. 필요 시 "HTML 편집" 탭으로 전환.
+- **교수 위치**: 자유입력 → **건물 드롭다운 + 호실 번호**. 국문 "리치과학관(R) 618호", 영문 "New Ricci Hall (R) Room 618"로 자동 표기 (`lib/buildings.ts`, 영문명은 서강대 영문 홈페이지 표기 기준).
+- 메인 연구분야 카드 4개 높이 통일 (설명 길이가 달라도 대칭).
+- 영상·학술제 게시판의 분야(카테고리) 제목도 영문 페이지에서 영어로 표시 (`category_en`).
+- DB: `supabase/schema_v6.sql` 실행 필요 (기존 office 문자열에서 건물/호실 자동 분리).

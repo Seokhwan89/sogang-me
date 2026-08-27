@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase-server';
 import { savePage, resetPage } from '@/app/admin/actions';
-import HtmlEditor from '@/components/admin/HtmlEditor';
+import RichEditor from '@/components/admin/RichEditor';
 import TranslateButton from '@/components/admin/TranslateButton';
 import { staticPages } from '@/content';
 import { notFound } from 'next/navigation';
@@ -17,8 +17,8 @@ export default async function EditPage({ params }: { params: { slug: string } })
         <label className="text-[13px]">페이지 제목 (한국어, 비우면 메뉴명)<input name="title_ko" defaultValue={data?.title_ko || ''} className="input mt-1" /></label>
         <label className="text-[13px]">Title (English)<input name="title_en" defaultValue={data?.title_en || ''} className="input mt-1" /></label>
       </div>
-      <div><p className="text-[13px] mb-1">본문 (한국어, HTML)</p><HtmlEditor name="content_ko" defaultValue={data?.content_ko || builtin.ko} folder="pages" rows={24} /></div>
-      <div><p className="text-[13px] mb-1">Content (English)</p><HtmlEditor name="content_en" defaultValue={data?.content_en || builtin.en} folder="pages" rows={18} /></div>
+      <div><p className="text-[13px] mb-1">본문 (한국어)</p><RichEditor name="content_ko" defaultValue={data?.content_ko || builtin.ko} folder="pages" minHeight={528} /></div>
+      <div><p className="text-[13px] mb-1">Content (English)</p><RichEditor name="content_en" defaultValue={data?.content_en || builtin.en} folder="pages" minHeight={396} /></div>
       <div className="flex flex-wrap gap-4 items-center text-[13px]"><TranslateButton pairs={[['content_ko', 'content_en']]} /><label className="flex items-center gap-2"><input type="checkbox" name="auto_translate" /> 저장 시 영문이 비어있으면 자동 번역</label></div>
       <button className="btn-primary">저장</button>
     </form>

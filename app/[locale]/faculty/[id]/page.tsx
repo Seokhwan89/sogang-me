@@ -3,6 +3,7 @@ import { getFacultyOne } from '@/lib/data';
 import { t, T, type Locale } from '@/lib/i18n';
 import { areas } from '@/content/areas';
 import { researchGroupDefs } from '@/lib/groups';
+import { formatOffice } from '@/lib/buildings';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { toHtml } from '@/lib/html';
@@ -22,7 +23,7 @@ export default async function FacultyDetail({ params }: { params: { locale: Loca
           {f.name_en && ko && <div><dt className="eyebrow">Name</dt><dd className="mt-1">{f.name_en}</dd></div>}
           {area && <div><dt className="eyebrow">{T(l, 'field')}</dt><dd className="mt-1"><Link href={`/${l}/graduate/areas#${area.id}`} className="hover:text-sg-red">{ko ? area.ko : area.en}</Link></dd></div>}
           {t(f, 'lab', l) && <div><dt className="eyebrow">{T(l, 'lab')}</dt><dd className="mt-1">{t(f, 'lab', l)}</dd></div>}
-          {f.office && <div><dt className="eyebrow">{T(l, 'office')}</dt><dd className="mt-1">{f.office}</dd></div>}
+          {formatOffice(f, ko) && <div><dt className="eyebrow">{T(l, 'office')}</dt><dd className="mt-1">{formatOffice(f, ko)}</dd></div>}
           {f.tel && <div><dt className="eyebrow">{T(l, 'tel')}</dt><dd className="mt-1 font-mono">{f.tel}</dd></div>}
           {f.email && <div><dt className="eyebrow">{T(l, 'email')}</dt><dd className="mt-1"><a href={`mailto:${f.email}`} className="hover:text-sg-red">{f.email}</a></dd></div>}
           {Array.isArray(f.groups) && f.groups.length > 0 && <div><dt className="eyebrow">{ko ? '융합연구 그룹' : 'Research groups'}</dt><dd className="mt-1 flex flex-wrap gap-1.5">{f.groups.map((g: string) => { const d = researchGroupDefs.find((x) => x.id === g); return d ? <Link key={g} href={`/${l}/graduate/groups`} className="text-[12.5px] px-2 py-0.5 bg-sg-mist border border-sg-line hover:border-sg-ink">{ko ? d.ko : d.en}</Link> : null; })}</dd></div>}
