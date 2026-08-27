@@ -18,7 +18,7 @@ export default async function PostPage({ params }: { params: { locale: Locale; b
   const termLabel = (term: string) => { const m = term.match(/^(\d{4})-(\d)$/); return m ? (ko ? `${m[1]}학년도 ${m[2]}학기` : `${m[1]} ${m[2] === '1' ? 'Spring' : 'Fall'}`) : term; };
   const meta: [string, string][] = [];
   if (p.term) meta.push([ko ? '학년도·학기' : 'Term', termLabel(p.term)]);
-  if (p.category) meta.push([ko ? '분야' : 'Category', festivalCategories.find((c) => c.id === p.category)?.[ko ? 'ko' : 'en'] || p.category]);
+  if (p.category) meta.push([ko ? '분야' : 'Category', festivalCategories.find((c) => c.id === p.category)?.[ko ? 'ko' : 'en'] || (ko ? p.category : (p as any).category_en || p.category)]);
   if (p.members) meta.push([ko ? '조원' : 'Members', p.members]);
   if (p.advisor) meta.push([ko ? '지도교수' : 'Advisor', p.advisor]);
   const images: { url: string; caption?: string }[] = p.images || [];

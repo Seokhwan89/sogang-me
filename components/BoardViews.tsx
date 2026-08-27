@@ -115,14 +115,14 @@ export function FestivalView({ posts, locale, year }: { posts: Post[]; locale: L
 export function VideosView({ posts, locale }: { posts: Post[]; locale: Locale }) {
   const ko = locale === 'ko';
   const sorted = [...posts].sort((a, b) => (a.sort_order ?? 100) - (b.sort_order ?? 100) || a.id - b.id);
-  const groups = groupBy(sorted, (p) => p.category || (ko ? '기타' : 'Other'));
+  const groups = groupBy(sorted, (p) => (ko ? p.category : (p as any).category_en || p.category) || (ko ? '기타' : 'Other'));
   const featured = sorted[0];
   return (
     <div>
       {featured?.video_url && (
         <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6 mb-14 items-start">
           <YouTube url={featured.video_url} title={featured.title_ko} />
-          <div><p className="eyebrow">{ko ? '추천 영상' : 'Featured'}</p><h2 className="text-[22px] font-bold mt-2 leading-snug">{t(featured, 'title', locale)}</h2>{featured.category && <p className="mt-1 text-[13px] text-sg-cardinal font-semibold">{featured.category}</p>}<p className="mt-3 text-[15px] leading-relaxed text-sg-gray11">{t(featured, 'excerpt', locale)}</p></div>
+          <div><p className="eyebrow">{ko ? '추천 영상' : 'Featured'}</p><h2 className="text-[22px] font-bold mt-2 leading-snug">{t(featured, 'title', locale)}</h2>{featured.category && <p className="mt-1 text-[13px] text-sg-cardinal font-semibold">{ko ? featured.category : (featured as any).category_en || featured.category}</p>}<p className="mt-3 text-[15px] leading-relaxed text-sg-gray11">{t(featured, 'excerpt', locale)}</p></div>
         </div>
       )}
       {Object.entries(groups).map(([cat, items]) => (

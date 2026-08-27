@@ -16,7 +16,7 @@ export async function getHomeData() {
     safe<any[]>(() => sb.from('banners').select('*').eq('visible', true).order('sort_order') as any, []),
     safe<any>(() => sb.from('site_settings').select('value').eq('key', 'home').single() as any, null),
     safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,attachments,created_at').eq('board', 'promo').eq('published', true).order('sort_order').order('created_at', { ascending: false }).limit(2) as any, []),
-    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,video_url,category,sort_order,created_at').eq('board', 'videos').eq('published', true).order('sort_order').limit(4) as any, []),
+    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,video_url,category,category_en,sort_order,created_at').eq('board', 'videos').eq('published', true).order('sort_order').limit(4) as any, []),
   ]);
   const n = settings?.value?.news_count ?? 8;
   const groups: Record<string, Post[]> = { notice: [], research: [], award: [], alumni_news: [] };
@@ -26,7 +26,7 @@ export async function getHomeData() {
 
 export async function getPosts(board: string, page = 1, per = 15, q = '') {
   const sb = createPublicClient();
-  let query = sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,created_at,is_pinned,view_count,author,attachments,video_url,term,members,advisor,category,sort_order', { count: 'exact' })
+  let query = sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,created_at,is_pinned,view_count,author,attachments,video_url,term,members,advisor,category,category_en,sort_order', { count: 'exact' })
     .eq('board', board).eq('published', true);
   if (q) query = query.or(`title_ko.ilike.%${q}%,title_en.ilike.%${q}%,content_ko.ilike.%${q}%`);
   const from = (page - 1) * per;

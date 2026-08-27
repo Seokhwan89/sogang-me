@@ -1,9 +1,12 @@
 import { createClient } from '@/lib/supabase-server';
 import { saveSettings, addAdmin } from '@/app/admin/actions';
+import TranslateAll from '@/components/admin/TranslateAll';
+import TranslateAll from '@/components/admin/TranslateAll';
 export default async function Settings() {
   const sb = createClient();
   const { data } = await sb.from('site_settings').select('value').eq('key', 'home').maybeSingle();
   const { data: admins } = await sb.from('admins').select('email');
+  const { count: missing } = await sb.from('posts').select('id', { count: 'exact', head: true }).or('title_en.is.null,content_en.is.null,excerpt_en.is.null,category_en.is.null');
   const v = data?.value || {}; const sections: string[] = v.sections || ['hero', 'promo', 'intro', 'news', 'videos', 'programs', 'quicklinks', 'gallery'];
   const all = [['hero', '히어로 (영상 배너 + 4개 분야)'], ['promo', '전공 홍보자료 카드 2개'], ['intro', '연구 분야 4개 카드'], ['news', '학과 소식 (공지/연구성과/수상/동문 4줄 카드뉴스)'], ['videos', '추천 영상 4개'], ['programs', '교육 프로그램 타일'], ['quicklinks', '자주 찾는 메뉴'], ['gallery', '갤러리']];
   return (<div>
@@ -24,6 +27,9 @@ export default async function Settings() {
       <p className="text-[12px] text-sg-steel">메인 노출 여부는 각 게시글 편집 화면의 "메인 페이지에 노출" 체크로 개별 제어됩니다.</p>
       <button className="btn-primary">저장</button>
     </form>
+    <div className="mt-10"><TranslateAll initialRemaining={missing || 0} /></div>
+    <h2 className="mt-10 font-bold">영문 번역</h2>
+    <div className="mt-3 max-w-2xl"><TranslateAll /></div>
     <h2 className="mt-10 font-bold">관리자 계정</h2>
     <p className="text-[13px] text-sg-steel mt-1">Supabase → Authentication → Users 에서 계정을 만든 뒤, 아래에 같은 이메일을 등록하면 관리 권한이 부여됩니다.</p>
     <ul className="mt-3 text-[13px] space-y-1">{(admins || []).map((a: any) => <li key={a.email} className="font-mono">{a.email}</li>)}</ul>

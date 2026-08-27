@@ -114,7 +114,7 @@ export default async function Home({ params }: { params: { locale: Locale } }) {
                 <Reveal key={v.id} delay={i * 70}>
                   <Link href={`/${l}/board/videos/${v.id}`} className="group block">
                     <div className="relative aspect-video overflow-hidden bg-white/5"><img src={youtubeThumb(v.video_url) || v.thumbnail_url} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" /><span className="absolute inset-0 grid place-items-center"><span className="w-12 h-12 rounded-full bg-sg-cardinal/90 grid place-items-center text-white pl-1">▶</span></span></div>
-                    <p className="mt-3 text-[12px] font-semibold text-white/60">{v.category}</p>
+                    <p className="mt-3 text-[12px] font-semibold text-white/60">{ko ? v.category : v.category_en || v.category}</p>
                     <h3 className="mt-1 font-bold text-[15px] leading-snug group-hover:text-sg-cardinal line-clamp-2">{t(v, 'title', l)}</h3>
                   </Link>
                 </Reveal>

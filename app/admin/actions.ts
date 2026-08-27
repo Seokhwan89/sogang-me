@@ -40,8 +40,8 @@ export async function savePost(fd: FormData) {
   const created = str(fd, 'created_at'); if (created) row.created_at = created;
   // Auto-translate missing English when enabled
   if (bool(fd, 'auto_translate') && (!row.title_en || !row.content_en)) {
-    const out = await translateKoToEn({ title: row.title_ko, content: row.content_ko, excerpt: row.excerpt_ko || '' });
-    if (out) { row.title_en ||= out.title; row.content_en ||= out.content; row.excerpt_en ||= out.excerpt; }
+    const out = await translateKoToEn({ title: row.title_ko, content: row.content_ko, excerpt: row.excerpt_ko || '', category: row.category || '' });
+    if (out) { row.title_en ||= out.title; row.content_en ||= out.content; row.excerpt_en ||= out.excerpt; if (out.category) row.category_en = out.category; }
   }
   const q = id ? sb.from('posts').update(row).eq('id', Number(id)) : sb.from('posts').insert(row);
   const { error } = await q; if (error) throw new Error(error.message);

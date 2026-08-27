@@ -27,3 +27,4 @@ drop policy if exists "ureca admin all" on ureca_applications;
 create policy "ureca admin all" on ureca_applications for all using (is_admin()) with check (is_admin());
 
 update site_settings set value = value || '{"notify_email":"sgmeoffice@gmail.com"}'::jsonb where key='home' and not (value ? 'notify_email');
+alter table posts add column if not exists category_en text;
