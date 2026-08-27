@@ -25,7 +25,7 @@ export const ui = {
     since: '1993년 설립', labs: '개 연구실', profs: '명 전임교수', bk21: '4단계 BK21 교육연구팀',
     newsTitle: '학과 소식', programsTitle: '교육 프로그램', galleryTitle: '갤러리', areasTitle: '연구 분야',
     ug: '학부과정', grad: '대학원과정', industry: '산학협력',
-    ugDesc: '130학점 심화전공과 5개 세부 분야 로드맵', gradDesc: '석사·박사·통합과정, 18개 연구실',
+    ugDesc: '130학점 심화전공과 5개 세부 분야 로드맵', gradDesc: '석사·박사·통합과정',
     urecaDesc: '학부생 연구 참여 프로그램 (Intern / Fellow)', industryDesc: '삼성전자·LG·현대모비스 채용연계 트랙',
   },
   en: {
@@ -43,7 +43,7 @@ export const ui = {
     since: 'Founded 1993', labs: 'research labs', profs: 'full-time faculty', bk21: 'BK21 FOUR program',
     newsTitle: 'News', programsTitle: 'Programs', galleryTitle: 'Gallery', areasTitle: 'Research areas',
     ug: 'Undergraduate', grad: 'Graduate', industry: 'Industry',
-    ugDesc: '130-credit intensive major with five specialization roadmaps', gradDesc: 'MS, PhD and integrated programs across 18 labs',
+    ugDesc: '130-credit intensive major with five specialization roadmaps', gradDesc: 'MS, PhD and integrated programs',
     urecaDesc: 'Undergraduate research experience (Intern / Fellow)', industryDesc: 'Samsung, LG and Hyundai Mobis hiring-linked tracks',
   },
 } as const;

@@ -3,7 +3,7 @@ import HeroVideo from '@/components/HeroVideo';
 import NewsRows from '@/components/NewsRows';
 import Reveal from '@/components/Reveal';
 import { emblemOf } from '@/components/FieldEmblems';
-import { getHomeData } from '@/lib/data';
+import { getHomeData, getLabCount } from '@/lib/data';
 import { T, t, type Locale } from '@/lib/i18n';
 import { areas } from '@/content/areas';
 import { assets } from '@/content/assets';
@@ -13,13 +13,13 @@ export const revalidate = 60;
 
 export default async function Home({ params }: { params: { locale: Locale } }) {
   const l = params.locale; const ko = l === 'ko';
-  const { groups, gallery, banners, settings, promo, videos } = await getHomeData();
+  const [{ groups, gallery, banners, settings, promo, videos }, labCount] = await Promise.all([getHomeData(), getLabCount()]);
   const sections: string[] = settings.sections || ['hero', 'promo', 'intro', 'news', 'videos', 'programs', 'quicklinks', 'gallery'];
   const on = (s: string) => sections.includes(s);
 
   const programs = [
     { k: 'ug', d: 'ugDesc', href: '/undergraduate/admission', img: assets.entrance, tagKo: '학부', tagEn: 'Undergraduate' },
-    { k: 'grad', d: 'gradDesc', href: '/graduate/admission', img: assets.mainVisual, tagKo: '대학원', tagEn: 'Graduate' },
+    { k: 'grad', d: 'gradDesc', href: '/graduate/admission', img: assets.mainVisual, tagKo: '대학원', tagEn: 'Graduate', extra: ko ? `, ${labCount}개 연구실` : `, ${labCount} labs` },
     { k: 'ureca', d: 'urecaDesc', href: '/undergraduate/ureca', img: assets.ureca, tagKo: '학부연구', tagEn: 'Research' },
     { k: 'industry', d: 'industryDesc', href: '/industry/samsung', img: assets.industry, tagKo: '산학협력', tagEn: 'Industry' },
   ] as const;
@@ -137,7 +137,7 @@ export default async function Home({ params }: { params: { locale: Locale } }) {
                     <div className="absolute inset-x-0 bottom-0 p-6">
                       <p className="text-[12.5px] font-semibold tracking-[0.12em] text-white/70 uppercase">{ko ? p.tagKo : p.tagEn}</p>
                       <h3 className="mt-1 font-brand text-[1.8rem] leading-tight">{T(l, p.k)}</h3>
-                      <p className="mt-2 text-[14px] text-white/80 leading-relaxed">{T(l, p.d)}</p>
+                      <p className="mt-2 text-[14px] text-white/80 leading-relaxed">{T(l, p.d)}{(p as any).extra || ''}</p>
                       <span className="mt-4 inline-flex w-10 h-10 items-center justify-center bg-sg-cardinal group-hover:bg-white group-hover:text-sg-cardinal transition-colors">→</span>
                     </div>
                   </Link>

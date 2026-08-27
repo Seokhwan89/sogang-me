@@ -5,6 +5,7 @@ import { getPost, getAdjacent } from '@/lib/data';
 import { t, T, type Locale } from '@/lib/i18n';
 import { notFound } from 'next/navigation';
 import YouTube from '@/components/YouTube';
+import ViewCounter from '@/components/ViewCounter';
 import { toHtml } from '@/lib/html';
 import { boardSection, festivalCategories } from '@/lib/nav';
 export const revalidate = 60;
@@ -26,6 +27,7 @@ export default async function PostPage({ params }: { params: { locale: Locale; b
   const contentHasImg = /<img/i.test(html || '');
   return (<>
     <PageHero locale={l} section={section} current={current} image={p.thumbnail_url || images[0]?.url || undefined} />
+    <ViewCounter id={p.id} />
     <article className="container-site py-14 max-w-4xl">
       <header className="border-b-2 border-sg-ink pb-7">
         <span className="eyebrow">{T(l, board as any) || board}</span>

@@ -11,6 +11,7 @@ export default function UrecaForm({ locale, labs }: { locale: Locale; labs: Lab[
   const [state, setState] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');
   const [msg, setMsg] = useState('');
   const [ranks, setRanks] = useState<Record<number, string>>({});
+  const [replaced, setReplaced] = useState(false);
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget); const row: any = Object.fromEntries(fd.entries());
@@ -19,9 +20,10 @@ export default function UrecaForm({ locale, labs }: { locale: Locale; labs: Lab[
     if (!choices.length || new Set(rs).size !== rs.length) { setMsg(ko ? '지망 순위(1·2·3)를 중복 없이 지정해 주세요.' : 'Assign unique ranks 1–3 to your preferred labs.'); setState('error'); return; }
     setState('saving');
     const r = await fetch('/api/ureca', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...row, choices }) });
-    if (!r.ok) { setMsg((await r.json()).error || 'error'); setState('error'); } else setState('done');
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { setMsg(j.error || 'error'); setState('error'); } else { setReplaced(!!j.replaced); setState('done'); }
   }
-  if (state === 'done') return <div className="border-l-4 border-sg-cardinal bg-sg-mist p-6"><p className="font-bold text-[17px]">{ko ? 'URECA 인턴 지원서가 접수되었습니다.' : 'Your URECA application has been received.'}</p><p className="text-[14.5px] text-sg-gray11 mt-1">{ko ? '지망 순서대로 해당 교수님께서 선발 여부를 결정하며, 결과는 이메일로 안내드립니다.' : 'Professors review applications in order of preference; results will be sent by email.'}</p></div>;
+  if (state === 'done') return <div className="border-l-4 border-sg-cardinal bg-sg-mist p-6"><p className="font-bold text-[17px]">{ko ? (replaced ? '지원서가 수정되었습니다.' : 'URECA 인턴 지원서가 접수되었습니다.') : (replaced ? 'Your application has been updated.' : 'Your URECA application has been received.')}</p><p className="text-[14.5px] text-sg-gray11 mt-1">{ko ? (replaced ? '같은 학기에 이전에 제출하신 지원서는 이번 내용으로 대체되었습니다. 지망 순서대로 해당 교수님께서 선발 여부를 결정하며, 결과는 이메일로 안내드립니다.' : '지망 순서대로 해당 교수님께서 선발 여부를 결정하며, 결과는 이메일로 안내드립니다.') : 'Professors review applications in order of preference; results will be sent by email.'}</p></div>;
   return (
     <form onSubmit={submit} className="border border-sg-line bg-white p-6 md:p-8 space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -51,6 +53,7 @@ export default function UrecaForm({ locale, labs }: { locale: Locale; labs: Lab[
         <button disabled={state === 'saving'} className="btn-primary">{state === 'saving' ? '…' : ko ? 'URECA Intern 지원하기' : 'Apply for URECA Intern'}</button>
         {state === 'error' && <p className="text-[13px] text-sg-cardinal">{msg}</p>}
       </div>
+      <p className="text-[12.5px] text-sg-gray9">{ko ? '※ 같은 학기에 다시 제출하면 마지막 제출본으로 자동 대체됩니다. 지원 내용을 바꾸고 싶으면 같은 학번으로 다시 제출해 주세요.' : '※ Submitting again for the same term replaces your previous application. To change your choices, simply submit again with the same student ID.'}</p>
       <p className="text-[12.5px] text-sg-gray9">{ko ? '제출된 정보는 URECA 선발 목적으로만 사용되며 학과사무실과 지망 연구실 교수에게 전달됩니다.' : 'Submitted information is used only for URECA selection and shared with the department office and the chosen professors.'}</p>
     </form>
   );

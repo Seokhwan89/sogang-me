@@ -19,6 +19,17 @@ async function admin() {
 const bool = (fd: FormData, k: string) => fd.get(k) === 'on' || fd.get(k) === 'true';
 const str = (fd: FormData, k: string) => (fd.get(k) as string | null)?.toString() ?? '';
 const nul = (s: string) => (s.trim() ? s : null);
+/** Storage의 media 버킷에 있는 파일이면 경로만 뽑아 삭제합니다. */
+function mediaPaths(urls: string[]) {
+  return urls.map((u) => { const m = (u || '').match(/\/storage\/v1\/object\/public\/media\/(.+)$/); return m ? decodeURIComponent(m[1]) : null; }).filter(Boolean) as string[];
+}
+async function removeMedia(sb: any, row: any) {
+  const urls = [row?.thumbnail_url, ...(row?.images || []).map((i: any) => i.url), ...(row?.attachments || []).map((f: any) => f.url)].filter(Boolean);
+  const inBody = [...String(row?.content_ko || '' ).matchAll(/src="([^"]+)"/g), ...String(row?.content_en || '').matchAll(/src="([^"]+)"/g)].map((m) => m[1]);
+  const paths = mediaPaths([...urls, ...inBody]);
+  if (paths.length) await sb.storage.from('media').remove(paths);
+  return paths.length;
+}
 const strip = (html: string) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 180);
 
 export async function signOut() {
@@ -51,6 +62,8 @@ export async function savePost(fd: FormData) {
 }
 export async function deletePost(fd: FormData) {
   const sb = await admin(); const id = Number(str(fd, 'id')); const board = str(fd, 'board');
+  const { data: row } = await sb.from('posts').select('thumbnail_url,images,attachments,content_ko,content_en').eq('id', id).single();
+  if (row) await removeMedia(sb, row);   // 글을 지우면 첨부·본문 이미지도 저장소에서 함께 삭제
   await sb.from('posts').delete().eq('id', id); revalidatePath('/', 'layout'); redirect(`${base()}/posts?board=${board}`);
 }
 
@@ -70,7 +83,10 @@ export async function saveFaculty(fd: FormData) {
   revalidatePath('/', 'layout'); redirect(`${base()}/faculty`);
 }
 export async function deleteFaculty(fd: FormData) {
-  const sb = await admin(); await sb.from('faculty').delete().eq('id', Number(str(fd, 'id'))); revalidatePath('/', 'layout'); redirect(`${base()}/faculty`);
+  const sb = await admin(); const id = Number(str(fd, 'id'));
+  const { data: row } = await sb.from('faculty').select('photo_url').eq('id', id).single();
+  if (row?.photo_url) await removeMedia(sb, { thumbnail_url: row.photo_url });
+  await sb.from('faculty').delete().eq('id', id); revalidatePath('/', 'layout'); redirect(`${base()}/faculty`);
 }
 
 export async function savePage(fd: FormData) {
@@ -114,7 +130,10 @@ export async function saveBanner(fd: FormData) {
   const { error } = await q; if (error) throw new Error(error.message); revalidatePath('/', 'layout'); redirect(`${base()}/banners`);
 }
 export async function deleteBanner(fd: FormData) {
-  const sb = await admin(); await sb.from('banners').delete().eq('id', Number(str(fd, 'id'))); revalidatePath('/', 'layout'); redirect(`${base()}/banners`);
+  const sb = await admin(); const id = Number(str(fd, 'id'));
+  const { data: row } = await sb.from('banners').select('image_url').eq('id', id).single();
+  if (row?.image_url) await removeMedia(sb, { thumbnail_url: row.image_url });
+  await sb.from('banners').delete().eq('id', id); revalidatePath('/', 'layout'); redirect(`${base()}/banners`);
 }
 export async function addAdmin(fd: FormData) {
   const sb = await admin(); const email = str(fd, 'email').trim().toLowerCase();

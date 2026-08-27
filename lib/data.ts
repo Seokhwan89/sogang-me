@@ -1,5 +1,6 @@
 import { createPublicClient } from './supabase-server';
 import type { Post } from '@/components/PostCard';
+import { safeQuery } from './search';
 
 const safe = async <T,>(fn: () => Promise<{ data: T | null; error: any }>, fallback: T): Promise<T> => {
   try { const { data, error } = await fn(); if (error) { console.error(error.message); return fallback; } return data ?? fallback; }
@@ -28,7 +29,8 @@ export async function getPosts(board: string, page = 1, per = 15, q = '') {
   const sb = createPublicClient();
   let query = sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,created_at,is_pinned,view_count,author,attachments,video_url,term,members,advisor,category,category_en,sort_order', { count: 'exact' })
     .eq('board', board).eq('published', true);
-  if (q) query = query.or(`title_ko.ilike.%${q}%,title_en.ilike.%${q}%,content_ko.ilike.%${q}%`);
+  const qs = safeQuery(q);
+  if (qs) query = query.or(`title_ko.ilike.%${qs}%,title_en.ilike.%${qs}%,content_ko.ilike.%${qs}%,members.ilike.%${qs}%`);
   const from = (page - 1) * per;
   const { data, count, error } = await query.order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).range(from, from + per - 1);
   if (error) { console.error(error.message); return { posts: [] as Post[], total: 0 }; }
@@ -37,7 +39,6 @@ export async function getPosts(board: string, page = 1, per = 15, q = '') {
 export async function getPost(id: number) {
   const sb = createPublicClient();
   const { data } = await sb.from('posts').select('*').eq('id', id).eq('published', true).single();
-  if (data) sb.rpc('increment_view', { post_id: id }).then(() => {});
   return data as Post | null;
 }
 export async function getAdjacent(board: string, id: number, created: string) {
@@ -66,4 +67,11 @@ export async function getReservations(facility: string, year: number, month: num
   const end = `${year}-${String(month).padStart(2, '0')}-${endD}`;
   const { data } = await sb.from('reservations').select('*').eq('facility', facility).gte('date', start).lte('date', end).neq('status', 'rejected').order('date').order('start_time');
   return data || [];
+}
+
+/** 전임교수 중 연구실이 등록된 수 — '18개 연구실' 같은 문구를 DB와 연동하기 위해 사용합니다. */
+export async function getLabCount() {
+  const sb = createPublicClient();
+  const { count } = await sb.from('faculty').select('id', { count: 'exact', head: true }).eq('is_emeritus', false).eq('published', true).not('lab_ko', 'is', null);
+  return count || 0;
 }
