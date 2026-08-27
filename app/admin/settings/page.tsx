@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase-server';
 import { saveSettings, addAdmin } from '@/app/admin/actions';
 import TranslateAll from '@/components/admin/TranslateAll';
+import { translateProvider } from '@/lib/translate';
 export default async function Settings() {
   const sb = createClient();
   const { data } = await sb.from('site_settings').select('value').eq('key', 'home').maybeSingle();
@@ -27,7 +28,7 @@ export default async function Settings() {
       <button className="btn-primary">저장</button>
     </form>
     <h2 className="mt-10 font-bold">영문 번역</h2>
-    <div className="mt-3 max-w-2xl"><TranslateAll /></div>
+    <div className="mt-3 max-w-2xl"><TranslateAll provider={translateProvider()} /></div>
     <h2 className="mt-10 font-bold">관리자 계정</h2>
     <p className="text-[13px] text-sg-steel mt-1">Supabase → Authentication → Users 에서 계정을 만든 뒤, 아래에 같은 이메일을 등록하면 관리 권한이 부여됩니다.</p>
     <ul className="mt-3 text-[13px] space-y-1">{(admins || []).map((a: any) => <li key={a.email} className="font-mono">{a.email}</li>)}</ul>

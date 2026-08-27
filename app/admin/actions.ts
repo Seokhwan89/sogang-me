@@ -51,16 +51,44 @@ export async function savePost(fd: FormData) {
     updated_at: new Date().toISOString(),
   };
   const created = str(fd, 'created_at'); if (created) row.created_at = created;
-  // Auto-translate missing English when enabled
-  if (bool(fd, 'auto_translate') && (!row.title_en || !row.content_en)) {
-    const out = await translateKoToEn({ title: row.title_ko, content: row.content_ko, excerpt: row.excerpt_ko || '', category: row.category || '' });
-    if (out) { row.title_en ||= out.title; row.content_en ||= out.content; row.excerpt_en ||= out.excerpt; if (out.category) row.category_en = out.category; }
+
+  /* 번역 정책
+   *  changed : 국문이 바뀐 항목만 다시 번역 (기본값) — 국문·영문이 어긋나는 것을 막습니다
+   *  missing : 영문이 비어 있는 항목만 번역
+   *  none    : 번역하지 않음 (영문을 직접 손봤거나 오타만 고친 경우)
+   * 관리자가 영문 칸을 직접 수정하면 그 항목은 자동 번역이 덮어쓰지 않습니다. */
+  const mode = str(fd, 'translate_mode') || 'changed';
+  if (mode !== 'none') {
+    let prev: any = null;
+    if (id) { const { data } = await sb.from('posts').select('title_ko,content_ko,excerpt_ko,category,title_en,content_en,excerpt_en,category_en').eq('id', Number(id)).single(); prev = data; }
+    const editedEn = (k: string) => !!prev && nul(str(fd, k)) !== (prev[k] ?? null);   // 관리자가 영문을 직접 고쳤는지
+    const koChanged = (k: string) => !prev || (row[k] || '') !== (prev[k] || '');
+    const need = (koKey: string, enKey: string) =>
+      !!row[koKey] && !editedEn(enKey) && (mode === 'missing' ? !row[enKey] : (koChanged(koKey) || !row[enKey]));
+
+    const fields: Record<string, string> = {};
+    if (need('title_ko', 'title_en')) fields.title = row.title_ko;
+    if (need('content_ko', 'content_en')) fields.content = row.content_ko;
+    if (need('excerpt_ko', 'excerpt_en')) fields.excerpt = row.excerpt_ko;
+    if (need('category', 'category_en')) fields.category = row.category;
+
+    if (Object.keys(fields).length) {
+      const out = await translateKoToEn(fields);
+      if (out) {
+        if (fields.title && out.title) row.title_en = out.title;
+        if (fields.content && out.content) row.content_en = out.content;
+        if (fields.excerpt && out.excerpt) row.excerpt_en = out.excerpt;
+        if (fields.category && out.category) row.category_en = out.category;
+      }
+    }
   }
+
   const q = id ? sb.from('posts').update(row).eq('id', Number(id)) : sb.from('posts').insert(row);
   const { error } = await q; if (error) throw new Error(error.message);
   revalidatePath('/', 'layout');
   redirect(`${base()}/posts?board=${row.board}`);
 }
+
 export async function deletePost(fd: FormData) {
   const sb = await admin(); const id = Number(str(fd, 'id')); const board = str(fd, 'board');
   const { data: row } = await sb.from('posts').select('thumbnail_url,images,attachments,content_ko,content_en').eq('id', id).single();
@@ -78,9 +106,29 @@ export async function saveFaculty(fd: FormData) {
   row.name_ko = str(fd, 'name_ko'); row.sort_order = Number(str(fd, 'sort_order') || 100);
   row.is_emeritus = bool(fd, 'is_emeritus'); row.published = bool(fd, 'published');
   row.groups = researchGroupDefs.filter((g) => bool(fd, `group_${g.id}`)).map((g) => g.id);
-  if (bool(fd, 'auto_translate')) {
-    const out = await translateKoToEn({ lab: row.lab_ko || '', research: row.research_ko || '', bio: row.bio_ko || '' });
-    if (out) { row.lab_en ||= out.lab; row.research_en ||= out.research; row.bio_en ||= out.bio; }
+  /* 교수 정보도 같은 정책: 국문이 바뀐 항목만 다시 번역 */
+  const mode = str(fd, 'translate_mode') || 'changed';
+  if (mode !== 'none') {
+    let prev: any = null;
+    if (id) { const { data } = await sb.from('faculty').select('lab_ko,lab_en,research_ko,research_en,bio_ko,bio_en,name_ko,name_en').eq('id', Number(id)).single(); prev = data; }
+    const editedEn = (k: string) => !!prev && nul(str(fd, k)) !== (prev[k] ?? null);
+    const koChanged = (k: string) => !prev || (row[k] || '') !== (prev[k] || '');
+    const need = (koKey: string, enKey: string) =>
+      !!row[koKey] && !editedEn(enKey) && (mode === 'missing' ? !row[enKey] : (koChanged(koKey) || !row[enKey]));
+    const fields: Record<string, string> = {};
+    if (need('lab_ko', 'lab_en')) fields.lab = row.lab_ko;
+    if (need('research_ko', 'research_en')) fields.research = row.research_ko;
+    if (need('bio_ko', 'bio_en')) fields.bio = row.bio_ko;
+    if (row.name_ko && !row.name_en) fields.name = row.name_ko;
+    if (Object.keys(fields).length) {
+      const out = await translateKoToEn(fields);
+      if (out) {
+        if (fields.lab && out.lab) row.lab_en = out.lab;
+        if (fields.research && out.research) row.research_en = out.research;
+        if (fields.bio && out.bio) row.bio_en = out.bio;
+        if (fields.name && out.name) row.name_en = out.name;
+      }
+    }
   }
   const q = id ? sb.from('faculty').update(row).eq('id', Number(id)) : sb.from('faculty').insert(row);
   const { error } = await q; if (error) throw new Error(error.message);
@@ -95,13 +143,19 @@ export async function deleteFaculty(fd: FormData) {
 
 export async function savePage(fd: FormData) {
   const sb = await admin(); const slug = str(fd, 'slug');
-  const row: any = { slug, title_ko: nul(str(fd, 'title_ko')), title_en: nul(str(fd, 'title_en')), content_ko: nul(str(fd, 'content_ko')), content_en: nul(str(fd, 'content_en')), updated_at: new Date().toISOString() };
-  if (bool(fd, 'auto_translate') && row.content_ko && !row.content_en) {
-    const out = await translateKoToEn({ content: row.content_ko }); if (out) row.content_en = out.content;
+  const row: any = { slug, title_ko: nul(str(fd, 'title_ko')), title_en: nul(str(fd, 'title_en')), content_ko: nul(toHtml(str(fd, 'content_ko'))), content_en: nul(toHtml(str(fd, 'content_en'))), updated_at: new Date().toISOString() };
+  const mode = str(fd, 'translate_mode') || 'changed';
+  if (mode !== 'none' && row.content_ko) {
+    const { data: prev } = await sb.from('pages').select('content_ko,content_en').eq('slug', slug).maybeSingle();
+    const editedEn = !!prev && row.content_en !== (prev.content_en ?? null);
+    const koChanged = !prev || row.content_ko !== (prev.content_ko || '');
+    const need = !editedEn && (mode === 'missing' ? !row.content_en : (koChanged || !row.content_en));
+    if (need) { const out = await translateKoToEn({ content: row.content_ko }); if (out?.content) row.content_en = out.content; }
   }
   const { error } = await sb.from('pages').upsert(row); if (error) throw new Error(error.message);
   revalidatePath('/', 'layout'); redirect(`${base()}/pages`);
 }
+
 export async function resetPage(fd: FormData) {
   const sb = await admin(); await sb.from('pages').delete().eq('slug', str(fd, 'slug')); revalidatePath('/', 'layout'); redirect(`${base()}/pages`);
 }

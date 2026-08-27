@@ -19,7 +19,13 @@ export default async function EditPage({ params }: { params: { slug: string } })
       </div>
       <div><p className="text-[13px] mb-1">본문 (한국어)</p><RichEditor name="content_ko" defaultValue={data?.content_ko || builtin.ko} folder="pages" minHeight={528} /></div>
       <div><p className="text-[13px] mb-1">Content (English)</p><RichEditor name="content_en" defaultValue={data?.content_en || builtin.en} folder="pages" minHeight={396} /></div>
-      <div className="flex flex-wrap gap-4 items-center text-[13px]"><TranslateButton pairs={[['content_ko', 'content_en']]} /><label className="flex items-center gap-2"><input type="checkbox" name="auto_translate" /> 저장 시 영문이 비어있으면 자동 번역</label></div>
+      <div className="flex flex-wrap gap-4 items-center text-[13px]"><TranslateButton pairs={[['content_ko', 'content_en']]} /><label className="flex items-center gap-2">영문 자동 번역
+        <select name="translate_mode" defaultValue="changed" className="input !w-auto !py-1.5">
+          <option value="changed">국문이 바뀌면 다시 번역 (권장)</option>
+          <option value="missing">영문이 비어 있을 때만</option>
+          <option value="none">번역하지 않음</option>
+        </select>
+      </label></div>
       <button className="btn-primary">저장</button>
     </form>
   </div>);

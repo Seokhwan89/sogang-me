@@ -1,11 +1,25 @@
+import { glossaryPrompt, polishEnglish } from './glossary';
+
 /**
- * KO -> EN translation.
- *  - ANTHROPIC_API_KEY set           : Claude (best quality, HTML-aware, paid per use)
- *  - otherwise (default, free)       : Google Translate web endpoint, with MyMemory as fallback.
- *    Free endpoints translate text nodes only; HTML tags are preserved by splitting around them.
- * Returns null only when every provider fails.
+ * KO -> EN 번역.
+ *  - ANTHROPIC_API_KEY 설정 시 : Claude 번역 (문맥·전문용어 정확, 권장)
+ *  - 미설정 시                  : 무료 번역기(Google 웹 엔드포인트 / MyMemory) — 품질이 낮습니다
  */
 const FREE_LIMIT = 4500;
+
+const SYSTEM = `You translate Korean content from a university mechanical-engineering department website into professional English for an international academic audience.
+
+Rules:
+- Korean routinely omits subjects. NEVER invent a first-person subject ("I", "my", "we", "our") unless the Korean text explicitly uses one. Department news is written in the third person: "Professor Choi's research field is microfluidics", not "My research field is...".
+- Keep the register of an official university announcement: neutral, factual, third person, past or present tense as appropriate.
+- Preserve every HTML tag, attribute, link and structure exactly; translate only human-readable text.
+- Korean names: give names in Given-name Family-name order in the romanization already used on the site when it appears in the text; otherwise use standard romanization. Do not translate names into English words.
+- Keep course codes (MEE1006), journal names, lab names, company names and awards accurate. Journal and conference names stay in their original English form.
+- Convert "605호" style room numbers to "Room 605". Academic terms: "2025학년도 2학기" = "Fall 2025", "1학기" = "Spring".
+- Use this glossary exactly:
+${glossaryPrompt}
+
+Return ONLY a JSON object with the same keys as the input and translated string values. No markdown, no commentary.`;
 
 async function gtx(text: string): Promise<string> {
   const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=en&dt=t&q=${encodeURIComponent(text)}`;
@@ -24,18 +38,15 @@ async function mymemory(text: string): Promise<string> {
 }
 async function freeText(text: string): Promise<string> {
   if (!text.trim()) return text;
-  const chunks: string[] = [];
-  let buf = '';
+  const chunks: string[] = []; let buf = '';
   for (const line of text.split(/(?<=[.!?。]\s|\n)/)) { if ((buf + line).length > FREE_LIMIT) { chunks.push(buf); buf = ''; } buf += line; }
   if (buf) chunks.push(buf);
   const out: string[] = [];
   for (const c of chunks) { try { out.push(await gtx(c)); } catch { out.push(await mymemory(c)); } }
-  return out.join('');
+  return polishEnglish(out.join(''));
 }
-/** Translate only text between HTML tags, keep tags/attributes intact. */
 async function freeHtml(html: string): Promise<string> {
-  const parts = html.split(/(<[^>]+>)/g);
-  const res: string[] = [];
+  const parts = html.split(/(<[^>]+>)/g); const res: string[] = [];
   for (const p of parts) res.push(p.startsWith('<') || !p.trim() ? p : await freeText(p));
   return res.join('');
 }
@@ -44,12 +55,17 @@ async function viaClaude(fields: Record<string, string>): Promise<Record<string,
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const res = await client.messages.create({
-    model: 'claude-sonnet-4-5', max_tokens: 8000,
-    system: 'You translate Korean university department website content into natural, professional English for an international academic audience. Preserve HTML tags, attributes, links and formatting exactly; translate only the human-readable text. Keep proper nouns (names, labs, course codes) accurate; romanize Korean names in standard form. Return ONLY a JSON object with the same keys as the input and translated string values, no markdown.',
+    model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5',
+    max_tokens: 8000,
+    system: SYSTEM,
     messages: [{ role: 'user', content: JSON.stringify(fields) }],
   });
   const text = res.content.map((c: any) => (c.type === 'text' ? c.text : '')).join('').replace(/```json|```/g, '').trim();
-  try { return JSON.parse(text); } catch { return null; }
+  try {
+    const parsed = JSON.parse(text);
+    for (const k of Object.keys(parsed)) if (typeof parsed[k] === 'string') parsed[k] = polishEnglish(parsed[k]);
+    return parsed;
+  } catch { return null; }
 }
 
 export async function translateKoToEn(fields: Record<string, string>): Promise<Record<string, string> | null> {

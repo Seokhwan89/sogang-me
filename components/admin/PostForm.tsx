@@ -45,7 +45,14 @@ export default function PostForm({ post, defaultBoard }: { post?: any; defaultBo
       </details>
       <div className="flex flex-wrap gap-3 items-center">
         <TranslateButton pairs={[['title_ko', 'title_en'], ['content_ko', 'content_en']]} />
-        <label className="text-[13px] flex items-center gap-2"><input type="checkbox" name="auto_translate" defaultChecked /> 저장 시 비어있는 영문 자동 번역</label>
+        <label className="text-[13px] flex items-center gap-2">영문 자동 번역
+          <select name="translate_mode" defaultValue="changed" className="input !w-auto !py-1.5">
+            <option value="changed">국문이 바뀌면 다시 번역 (권장)</option>
+            <option value="missing">영문이 비어 있을 때만</option>
+            <option value="none">번역하지 않음</option>
+          </select>
+        </label>
+        <span className="text-[12px] text-sg-steel">영문 칸을 직접 고치면 그 항목은 자동 번역이 덮어쓰지 않습니다.</span>
       </div>
       <section className="grid gap-6 md:grid-cols-2">
         <div className="border border-sg-line bg-white p-4">

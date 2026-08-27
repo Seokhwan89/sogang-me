@@ -46,7 +46,13 @@ export default async function EditFaculty({ params }: { params: { id: string } }
       <div><p className="text-[13px] mb-1">Biography (English)</p><RichEditor name="bio_en" defaultValue={f?.bio_en || ''} folder="faculty" minHeight={132} /></div>
       <div className="flex flex-wrap gap-4 items-center text-[13px]">
         <TranslateButton pairs={[['lab_ko', 'lab_en'], ['research_ko', 'research_en'], ['bio_ko', 'bio_en']]} />
-        <label className="flex items-center gap-2"><input type="checkbox" name="auto_translate" defaultChecked /> 저장 시 비어있는 영문 자동 번역</label>
+        <label className="flex items-center gap-2">영문 자동 번역
+          <select name="translate_mode" defaultValue="changed" className="input !w-auto !py-1.5">
+            <option value="changed">국문이 바뀌면 다시 번역 (권장)</option>
+            <option value="missing">영문이 비어 있을 때만</option>
+            <option value="none">번역하지 않음</option>
+          </select>
+        </label>
         <label className="flex items-center gap-2"><input type="checkbox" name="is_emeritus" defaultChecked={f?.is_emeritus} /> 명예교수</label>
         <label className="flex items-center gap-2"><input type="checkbox" name="published" defaultChecked={f ? f.published : true} /> 공개</label>
       </div>
