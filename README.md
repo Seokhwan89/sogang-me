@@ -81,4 +81,4 @@ Supabase SQL Editor에서 `supabase/schema_v3.sql` → `supabase/seed_v3.sql` �
 ### 아직 코드로 관리하는 항목 (의도적)
 - 4개 기초전공분야 이름·설명, 7개 연구그룹 이름 (`content/pages-grad.ts`, `lib/groups.ts`)
 - 학사일정 (`content/pages-ug.ts`의 `calendar2026`) — 매년 갱신 시 요청
-- 메뉴 구조·게시판 목록 (`lib/nav.ts`), 화면 문구 (`lib/i18n.ts`)
+- 메뉴 구조·게시판 목록 (`lib/nav.ts`), 화면 문구 (`lib/i18n.ts`).
