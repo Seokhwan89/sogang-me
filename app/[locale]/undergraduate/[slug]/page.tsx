@@ -41,13 +41,13 @@ export default async function UG({ params }: { params: { locale: Locale; slug: s
         {majorFields.map((f, i) => { const E = emblemOf[f.id]; return (
           <Reveal key={f.id}>
             <section id={f.id} className="scroll-mt-40 grid md:grid-cols-[220px_1fr] gap-6 md:gap-10 border-t border-sg-line pt-8">
-              <div><div className="w-full max-w-[220px] text-sg-cardinal"><E className="w-full h-auto" /></div><p className="mt-2 text-[13px] font-semibold text-sg-gray9">{String(i + 1).padStart(2, '0')} · {ko ? f.en : f.ko}</p></div>
+              <div><div className="w-full max-w-[220px] text-sg-cardinal"><E className="w-full h-auto" /></div><p className="mt-2 text-[13px] font-semibold text-sg-gray9">{String(i + 1).padStart(2, '0')}{ko ? ` · ${f.en}` : ''}</p></div>
               <div>
                 <p className="eyebrow">{ko ? f.tagKo : f.tagEn}</p>
                 <h3 className="font-brand text-[1.7rem] md:text-[2.1rem] mt-1 leading-tight">{ko ? f.ko : f.en}</h3>
-                <p className="mt-2 text-[15px] font-semibold text-sg-gray11">{ko ? f.summaryKo : ''}</p>
+                {ko && <p className="mt-2 text-[15px] font-semibold text-sg-gray11">{f.summaryKo}</p>}
                 <p className="mt-4 text-[16px] leading-[1.85]">{ko ? f.bodyKo : f.bodyEn}</p>
-                <div className="mt-5"><p className="text-[12.5px] font-semibold tracking-wider text-sg-gray9 uppercase mb-2">{ko ? '관련 교과목' : 'Related courses'}</p><ul className="flex flex-wrap gap-2">{f.courses.map((c) => <li key={c} className="text-[13px] px-3 py-1 bg-sg-mist border border-sg-line">{c}</li>)}</ul></div>
+                <div className="mt-5"><p className="text-[12.5px] font-semibold tracking-wider text-sg-gray9 uppercase mb-2">{ko ? '관련 교과목' : 'Related courses'}</p><ul className="flex flex-wrap gap-2">{(ko ? f.courses : (f as any).coursesEn || f.courses).map((c: string) => <li key={c} className="text-[13px] px-3 py-1 bg-sg-mist border border-sg-line">{c}</li>)}</ul></div>
               </div>
             </section>
           </Reveal>
