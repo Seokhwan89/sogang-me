@@ -4,13 +4,14 @@ import { t, T, type Locale } from '@/lib/i18n';
 import { areas } from '@/content/areas';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { toHtml } from '@/lib/html';
 export const revalidate = 300;
 
 export default async function FacultyDetail({ params }: { params: { locale: Locale; id: string } }) {
   const l = params.locale; const ko = l === 'ko';
   const f = await getFacultyOne(Number(params.id)); if (!f) notFound();
   const area = areas.find((a) => a.id === f.field);
-  const research = t(f, 'research', l); const bio = t(f, 'bio', l);
+  const research = toHtml(t(f, 'research', l)); const bio = toHtml(t(f, 'bio', l));
   return (<>
     <PageHero locale={l} section="faculty" current={f.is_emeritus ? 'emeritus' : 'professors'} title={`${t(f, 'name', l)} ${t(f, 'title', l)}`} />
     <div className="container-site py-14 grid lg:grid-cols-[300px_1fr] gap-12 items-start">

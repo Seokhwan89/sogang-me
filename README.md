@@ -41,4 +41,27 @@ npm install && npm run dev   # http://localhost:3000
 - 타 서버 이전: Supabase는 표준 PostgreSQL이라 `pg_dump` 로 전량 추출 가능 (Database → Backups)
 
 ## 비용
-Vercel Hobby(무료) + Supabase Free(DB 500MB, 저장소 1GB)로 학과 홈페이지 트래픽은 충분합니다. 저장소가 부족해지면 Supabase Pro($25/월)로 전환..
+Vercel Hobby(무료) + Supabase Free(DB 500MB, 저장소 1GB)로 학과 홈페이지 트래픽은 충분합니다. 저장소가 부족해지면 Supabase Pro($25/월)로 전환.
+
+## v3 (2026-08-27) 변경 사항 — 이승엽 교수님 요청 반영
+### 새 메뉴 (학부과정 아래)
+| 메뉴 | 경로 | 데이터 |
+|---|---|---|
+| 전공소개 | `/undergraduate/majors` | `content/majors.ts` (4대 분야 원고·과목·추천교과목) + `/images/intro/*.jpg` (PDF 15쪽 렌더) |
+| 전공 홍보자료 | `/board/promo` | posts(board=`promo`), 첨부 PDF는 `/public/docs/` |
+| 창의적종합설계 | `/board/capstone` | posts(board=`capstone`) — term(`2025-2`), members, advisor, sort_order(조 번호), thumbnail(포스터) |
+| 학술제 학부생 발표 | `/board/festival` | posts(board=`festival`) — term(연도), category(ureca/capstone/project/award), members, advisor, 포스터 |
+| 기계공학도가 봐야 할 영상 | `/board/videos` | posts(board=`videos`) — video_url(YouTube), category(그룹 제목), sort_order |
+### 기능
+- 모든 게시판에 **YouTube 주소** 입력 가능 → 본문 위에 영상, 카드 썸네일 자동
+- 게시글 **줄바꿈 자동 처리** (Enter = 줄바꿈, 빈 줄 = 문단)
+- **URECA 인턴 온라인 지원** (`/undergraduate/ureca` 하단) → 관리자 > URECA 지원 (연도·기간 필터, 선발/미선발, CSV)
+- **이메일 알림**: 시설 예약·URECA 지원 접수 시 관리자 설정의 이메일로 발송. Vercel 환경변수 `RESEND_API_KEY` 필요(resend.com 무료). 미설정 시 접수만 되고 메일은 생략
+- 메인: 히어로 아래 **전공 홍보자료 카드 2개**, 소식 4줄째 **동문·구성원 소식**, **추천 영상** 섹션
+### DB 마이그레이션
+Supabase SQL Editor에서 `supabase/schema_v3.sql` → `supabase/seed_v3.sql` 순서로 실행
+### 관리자 등록 방법
+관리자 > 게시판 > 해당 게시판 선택 > "+ 새 글". 창의적종합설계·학술제·영상 게시판을 고르면 학년도/조원/지도교수/구분/순서 입력칸이 나타납니다. 포스터는 "사진 추가"로 올리고 "대표" 지정.
+### 아직 없는 원본 자료 (관리자가 추후 등록)
+- 2025-2, 2026-1 창의적종합설계 **포스터** (메일 첨부 만료 — 이승엽 교수님/박현주 선생님께 재요청)
+- 학술제 학부생 발표 자료(URECA·창의적종합설계·연구프로젝트)와 **학부생 수상자 명단** — 학과 행정팀 보유 자료

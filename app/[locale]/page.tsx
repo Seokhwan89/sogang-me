@@ -7,13 +7,14 @@ import { getHomeData } from '@/lib/data';
 import { T, t, type Locale } from '@/lib/i18n';
 import { areas } from '@/content/areas';
 import { assets } from '@/content/assets';
+import { youtubeThumb } from '@/lib/html';
 
 export const revalidate = 60;
 
 export default async function Home({ params }: { params: { locale: Locale } }) {
   const l = params.locale; const ko = l === 'ko';
-  const { groups, gallery, banners, settings } = await getHomeData();
-  const sections: string[] = settings.sections || ['hero', 'intro', 'news', 'programs', 'quicklinks', 'gallery'];
+  const { groups, gallery, banners, settings, promo, videos } = await getHomeData();
+  const sections: string[] = settings.sections || ['hero', 'promo', 'intro', 'news', 'videos', 'programs', 'quicklinks', 'gallery'];
   const on = (s: string) => sections.includes(s);
 
   const programs = [
@@ -31,6 +32,29 @@ export default async function Home({ params }: { params: { locale: Locale } }) {
   return (
     <>
       {on('hero') && <HeroVideo locale={l} videoUrl={settings.hero_video_url ?? assets.campusVideo} poster={settings.hero_poster_url ?? assets.mainVisual} taglineKo={settings.tagline_ko} taglineEn={settings.tagline_en} />}
+
+      {on('promo') && promo.length > 0 && (
+        <section className="container-site -mt-14 relative z-10">
+          <div className="grid gap-4 md:grid-cols-2">
+            {promo.map((p: any, i: number) => { const file = (p.attachments || [])[0]; return (
+              <Reveal key={p.id} delay={i * 80}>
+                <div className="card flex overflow-hidden bg-white border-t-4 border-t-sg-cardinal shadow-[0_18px_40px_-16px_rgba(26,26,26,.28)]">
+                  <Link href={`/${l}/board/promo/${p.id}`} className="w-[38%] shrink-0 bg-sg-mist overflow-hidden"><img src={p.thumbnail_url} alt="" className="w-full h-full object-cover" /></Link>
+                  <div className="p-5 md:p-6 flex flex-col">
+                    <p className="eyebrow">{ko ? '전공 홍보자료' : 'Intro materials'}</p>
+                    <h3 className="mt-1 text-[17px] md:text-[19px] font-bold leading-snug"><Link href={`/${l}/board/promo/${p.id}`} className="hover:text-sg-cardinal">{t(p, 'title', l)}</Link></h3>
+                    <p className="mt-2 text-[13.5px] text-sg-gray11 leading-relaxed line-clamp-2">{t(p, 'excerpt', l)}</p>
+                    <div className="mt-auto pt-4 flex gap-2">
+                      <Link href={`/${l}/board/promo/${p.id}`} className="btn-ghost !py-1.5 !px-3 !text-[13px]">{ko ? '자료 보기' : 'View'}</Link>
+                      {file && <a href={file.url} download className="btn-primary !py-1.5 !px-3 !text-[13px]">PDF ↓</a>}
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ); })}
+          </div>
+        </section>
+      )}
 
       {banners.length > 0 && (
         <section className="container-site -mt-10 relative z-10 grid gap-4 md:grid-cols-3">
@@ -75,6 +99,28 @@ export default async function Home({ params }: { params: { locale: Locale } }) {
         <section className="container-site py-20">
           <Reveal className="mb-12"><p className="eyebrow">{T(l, 'newsTitle')}</p><h2 className="h-section mt-3">{ko ? '기계공학과 소식' : 'News from the department'}</h2></Reveal>
           <NewsRows locale={l} groups={groups} />
+        </section>
+      )}
+
+      {on('videos') && videos.length > 0 && (
+        <section className="bg-sg-ink text-white py-20">
+          <div className="container-site">
+            <Reveal className="flex items-end justify-between gap-4 mb-8">
+              <div><p className="eyebrow !text-white/70">{ko ? '기계공학도가 봐야 할 영상' : 'Videos for ME students'}</p><h2 className="h-section mt-3">{ko ? '영상으로 만나는 기계공학' : 'Mechanical engineering on screen'}</h2></div>
+              <Link href={`/${l}/board/videos`} className="text-[14px] font-semibold text-white/70 hover:text-white whitespace-nowrap">{T(l, 'more')} +</Link>
+            </Reveal>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {videos.map((v: any, i: number) => (
+                <Reveal key={v.id} delay={i * 70}>
+                  <Link href={`/${l}/board/videos/${v.id}`} className="group block">
+                    <div className="relative aspect-video overflow-hidden bg-white/5"><img src={youtubeThumb(v.video_url) || v.thumbnail_url} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" /><span className="absolute inset-0 grid place-items-center"><span className="w-12 h-12 rounded-full bg-sg-cardinal/90 grid place-items-center text-white pl-1">▶</span></span></div>
+                    <p className="mt-3 text-[12px] font-semibold text-white/60">{v.category}</p>
+                    <h3 className="mt-1 font-bold text-[15px] leading-snug group-hover:text-sg-cardinal line-clamp-2">{t(v, 'title', l)}</h3>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
+          </div>
         </section>
       )}
 

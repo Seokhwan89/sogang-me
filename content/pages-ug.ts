@@ -1,6 +1,7 @@
 import type { PageContent } from './types';
 
 export const undergraduate: Record<string, PageContent> = {
+  'undergraduate/majors': { ko: '', en: '' },
   'undergraduate/admission': {
     ko: `<p>학부 입학 정보에 대한 상세한 내용은 서강대학교 입학처 홈페이지에서 확인하실 수 있습니다.</p>
 <p><a href="https://admission.sogang.ac.kr" target="_blank" rel="noreferrer" class="btn-primary !no-underline !text-white">서강대학교 입학처 바로가기 →</a></p>

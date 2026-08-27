@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase-server';
 import { translateKoToEn } from '@/lib/translate';
+import { toHtml } from '@/lib/html';
 
 import { adminBase as base } from '@/lib/admin';
 
@@ -28,7 +29,8 @@ export async function savePost(fd: FormData) {
   const id = str(fd, 'id');
   const row: any = {
     board: str(fd, 'board'), title_ko: str(fd, 'title_ko'), title_en: nul(str(fd, 'title_en')),
-    content_ko: str(fd, 'content_ko'), content_en: nul(str(fd, 'content_en')),
+    content_ko: toHtml(str(fd, 'content_ko')), content_en: nul(toHtml(str(fd, 'content_en'))),
+    video_url: nul(str(fd, 'video_url')), term: nul(str(fd, 'term')), members: nul(str(fd, 'members')), advisor: nul(str(fd, 'advisor')), category: nul(str(fd, 'category')), sort_order: Number(str(fd, 'sort_order') || 100),
     excerpt_ko: nul(str(fd, 'excerpt_ko')) || strip(str(fd, 'content_ko')), excerpt_en: nul(str(fd, 'excerpt_en')),
     thumbnail_url: nul(str(fd, 'thumbnail_url')), author: str(fd, 'author') || '기계공학과',
     is_pinned: bool(fd, 'is_pinned'), show_on_home: bool(fd, 'show_on_home'), published: bool(fd, 'published'),
@@ -95,10 +97,10 @@ export async function addReservation(fd: FormData) {
 
 export async function saveSettings(fd: FormData) {
   const sb = await admin();
-  const sections = ['hero', 'intro', 'news', 'programs', 'quicklinks', 'gallery'].filter((s) => bool(fd, `sec_${s}`));
+  const sections = ['hero', 'promo', 'intro', 'news', 'videos', 'programs', 'quicklinks', 'gallery'].filter((s) => bool(fd, `sec_${s}`));
   const order = str(fd, 'order').split(',').map((s) => s.trim()).filter(Boolean);
   const ordered = [...order.filter((s) => sections.includes(s)), ...sections.filter((s) => !order.includes(s))];
-  const value = { sections: ordered, news_count: Number(str(fd, 'news_count') || 8), tagline_ko: nul(str(fd, 'tagline_ko')), tagline_en: nul(str(fd, 'tagline_en')), hero_video_url: nul(str(fd, 'hero_video_url')), hero_poster_url: nul(str(fd, 'hero_poster_url')) };
+  const value = { sections: ordered, news_count: Number(str(fd, 'news_count') || 8), tagline_ko: nul(str(fd, 'tagline_ko')), tagline_en: nul(str(fd, 'tagline_en')), hero_video_url: nul(str(fd, 'hero_video_url')), hero_poster_url: nul(str(fd, 'hero_poster_url')), notify_email: nul(str(fd, 'notify_email')) };
   const { error } = await sb.from('site_settings').upsert({ key: 'home', value, updated_at: new Date().toISOString() });
   if (error) throw new Error(error.message); revalidatePath('/', 'layout'); redirect(`${base()}/settings`);
 }
@@ -115,4 +117,10 @@ export async function deleteBanner(fd: FormData) {
 export async function addAdmin(fd: FormData) {
   const sb = await admin(); const email = str(fd, 'email').trim().toLowerCase();
   if (email) await sb.from('admins').insert({ email }); redirect(`${base()}/settings`);
+}
+
+export async function setUreca(fd: FormData) {
+  const sb = await admin(); const id = Number(str(fd, 'id')); const status = str(fd, 'status');
+  if (status === 'delete') await sb.from('ureca_applications').delete().eq('id', id); else await sb.from('ureca_applications').update({ status }).eq('id', id);
+  redirect(`${base()}/ureca`);
 }

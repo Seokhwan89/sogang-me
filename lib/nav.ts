@@ -13,11 +13,16 @@ export const nav: NavItem[] = [
   ]},
   { id: 'undergraduate', ko: '학부과정', en: 'Undergraduate', href: '/undergraduate/admission', sub: [
     { id: 'admission', ko: '입학안내', en: 'Admission', href: '/undergraduate/admission' },
+    { id: 'majors', ko: '전공소개', en: 'Major Fields', href: '/undergraduate/majors' },
+    { id: 'promo', ko: '전공 홍보자료', en: 'Intro Materials', href: '/board/promo' },
     { id: 'curriculum', ko: '교과과정', en: 'Curriculum', href: '/undergraduate/curriculum' },
     { id: 'competency', ko: '전공능력', en: 'Competencies', href: '/undergraduate/competency' },
     { id: 'calendar', ko: '학사일정', en: 'Academic Calendar', href: '/undergraduate/calendar' },
     { id: 'activities', ko: '학생활동', en: 'Student Activities', href: '/undergraduate/activities' },
     { id: 'ureca', ko: '학부연구프로그램(URECA)', en: 'URECA', href: '/undergraduate/ureca' },
+    { id: 'capstone', ko: '창의적종합설계', en: 'Capstone Design', href: '/board/capstone' },
+    { id: 'festival', ko: '학술제 학부생 발표', en: 'Student Research Festival', href: '/board/festival' },
+    { id: 'videos', ko: '기계공학도가 봐야 할 영상', en: 'Videos for ME Students', href: '/board/videos' },
   ]},
   { id: 'graduate', ko: '대학원과정', en: 'Graduate', href: '/graduate/admission', sub: [
     { id: 'admission', ko: '입학안내', en: 'Admission', href: '/graduate/admission' },
@@ -49,7 +54,21 @@ export const nav: NavItem[] = [
   ]},
 ];
 export const label = (item: { ko: string; en: string }, l: Locale) => (l === 'en' ? item.en : item.ko);
-export const boards = ['notice', 'research', 'award', 'scholarship', 'major', 'gallery', 'archive', 'events', 'alumni_news'] as const;
+export const boards = ['notice', 'research', 'award', 'scholarship', 'major', 'gallery', 'archive', 'events', 'alumni_news', 'promo', 'capstone', 'festival', 'videos'] as const;
+/** Which nav section/sub a board belongs to (for hero + tabs). */
+export const boardSection: Record<string, [string, string]> = {
+  alumni_news: ['alumni', 'news'], promo: ['undergraduate', 'promo'], capstone: ['undergraduate', 'capstone'], festival: ['undergraduate', 'festival'], videos: ['undergraduate', 'videos'],
+};
+export const festivalCategories = [
+  { id: 'ureca', ko: 'URECA 학부인턴 연구', en: 'URECA Intern Research' },
+  { id: 'capstone', ko: '창의적종합설계팀 연구', en: 'Capstone Design Team' },
+  { id: 'project', ko: '연구프로젝트팀 연구', en: 'Research Project Team' },
+  { id: 'award', ko: '학부생 수상', en: 'Undergraduate Awards' },
+];
+export const urecaTerms = [
+  { id: 'spring', ko: '봄학기', en: 'Spring semester' }, { id: 'summer', ko: '여름방학', en: 'Summer break' },
+  { id: 'fall', ko: '가을학기', en: 'Fall semester' }, { id: 'winter', ko: '겨울방학', en: 'Winter break' },
+];
 export type Board = (typeof boards)[number];
 export const facilities = [
   { id: 'seminar', ko: '세미나실', en: 'Seminar room' },

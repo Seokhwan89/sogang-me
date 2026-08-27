@@ -8,18 +8,20 @@ const safe = async <T,>(fn: () => Promise<{ data: T | null; error: any }>, fallb
 
 export async function getHomeData() {
   const sb = createPublicClient();
-  const [posts, gallery, banners, settings] = await Promise.all([
-    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,created_at,is_pinned')
-      .in('board', ['notice', 'research', 'award']).eq('published', true).eq('show_on_home', true)
-      .order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(80) as any, []),
+  const [posts, gallery, banners, settings, promo, videos] = await Promise.all([
+    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,video_url,created_at,is_pinned')
+      .in('board', ['notice', 'research', 'award', 'alumni_news']).eq('published', true).eq('show_on_home', true)
+      .order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(120) as any, []),
     safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,thumbnail_url,images,created_at').eq('board', 'gallery').eq('published', true).order('created_at', { ascending: false }).limit(8) as any, []),
     safe<any[]>(() => sb.from('banners').select('*').eq('visible', true).order('sort_order') as any, []),
     safe<any>(() => sb.from('site_settings').select('value').eq('key', 'home').single() as any, null),
+    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,attachments,created_at').eq('board', 'promo').eq('published', true).order('sort_order').order('created_at', { ascending: false }).limit(2) as any, []),
+    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,video_url,category,sort_order,created_at').eq('board', 'videos').eq('published', true).order('sort_order').limit(4) as any, []),
   ]);
   const n = settings?.value?.news_count ?? 8;
-  const groups: Record<string, Post[]> = { notice: [], research: [], award: [] };
+  const groups: Record<string, Post[]> = { notice: [], research: [], award: [], alumni_news: [] };
   for (const p of posts) if (groups[p.board] && groups[p.board].length < n) groups[p.board].push(p);
-  return { groups, gallery, banners, settings: settings?.value ?? {} };
+  return { groups, gallery, banners, settings: settings?.value ?? {}, promo, videos };
 }
 
 export async function getPosts(board: string, page = 1, per = 15, q = '') {

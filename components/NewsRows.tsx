@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { fmtDate, type Post } from './PostCard';
 import { t, T, type Locale } from '@/lib/i18n';
 import { coverFor } from '@/lib/placeholder';
+import { youtubeThumb } from '@/lib/html';
 
 function Arrow({ dir, onClick, disabled }: { dir: 'l' | 'r'; onClick: () => void; disabled: boolean }) {
   return (
@@ -21,8 +22,8 @@ function Row({ locale, board, posts, variant }: { locale: Locale; board: string;
   const update = () => { const el = ref.current; if (!el) return; setPos({ start: el.scrollLeft < 8, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 8 }); };
   useEffect(() => { update(); const el = ref.current; el?.addEventListener('scroll', update, { passive: true }); window.addEventListener('resize', update); return () => { el?.removeEventListener('scroll', update); window.removeEventListener('resize', update); }; }, []);
   const step = (d: number) => { const el = ref.current; if (!el) return; const card = el.querySelector<HTMLElement>('[data-card]'); const w = card ? card.offsetWidth + 20 : 320; el.scrollBy({ left: d * w, behavior: 'smooth' }); };
-  const titles: Record<string, [string, string]> = { notice: ['공지사항', 'Notice'], research: ['연구성과', 'Research Highlights'], award: ['수상', 'Awards & Honors'] };
-  const subs: Record<string, [string, string]> = { notice: ['학사·장학·행사 안내', 'Academic and event notices'], research: ['논문·과제·연구 소식', 'Papers, projects and research news'], award: ['학생·교수 수상 소식', 'Student and faculty honors'] };
+  const titles: Record<string, [string, string]> = { notice: ['공지사항', 'Notice'], research: ['연구성과', 'Research Highlights'], award: ['수상', 'Awards & Honors'], alumni_news: ['동문·구성원 소식', 'Alumni & Community'] };
+  const subs: Record<string, [string, string]> = { notice: ['학사·장학·행사 안내', 'Academic and event notices'], research: ['논문·과제·연구 소식', 'Papers, projects and research news'], award: ['학생·교수 수상 소식', 'Student and faculty honors'], alumni_news: ['재학생·졸업생·교수진 소식', 'Students, alumni and faculty news'] };
   return (
     <div className="py-10 first:pt-0 border-b border-sg-line last:border-0">
       <div className="flex items-end justify-between gap-4 mb-6">
@@ -39,7 +40,7 @@ function Row({ locale, board, posts, variant }: { locale: Locale; board: string;
         <div ref={ref} className="flex gap-5 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-5 px-5 md:mx-0 md:px-0">
           {posts.map((p, i) => {
             const img = p.thumbnail_url || (p.images && p.images[0]?.url);
-            const cover = img || coverFor(board, p.title_ko, p.id);
+            const cover = img || youtubeThumb(p.video_url) || coverFor(board, p.title_ko, p.id);
             return (
               <Link key={p.id} data-card href={`/${locale}/board/${board}/${p.id}`} className="card group snap-start shrink-0 w-[78vw] sm:w-[calc(50%-10px)] lg:w-[calc(25%-15px)] flex flex-col overflow-hidden">
                 {variant === 'image' ? (
@@ -71,6 +72,7 @@ export default function NewsRows({ locale, groups }: { locale: Locale; groups: R
       <Row locale={locale} board="notice" posts={groups.notice || []} variant="text" />
       <Row locale={locale} board="research" posts={groups.research || []} variant="image" />
       <Row locale={locale} board="award" posts={groups.award || []} variant="image" />
+      <Row locale={locale} board="alumni_news" posts={groups.alumni_news || []} variant="image" />
     </div>
   );
 }
