@@ -4,14 +4,18 @@ export default async function Settings() {
   const sb = createClient();
   const { data } = await sb.from('site_settings').select('value').eq('key', 'home').maybeSingle();
   const { data: admins } = await sb.from('admins').select('email');
-  const v = data?.value || {}; const sections: string[] = v.sections || ['hero', 'intro', 'news', 'quicklinks', 'programs', 'gallery'];
-  const all = [['hero', '히어로 (상단 대형 배너)'], ['intro', '연구 분야 4개'], ['news', '학과 소식 (공지/연구성과/수상 탭)'], ['quicklinks', '시설 예약 바로가기'], ['programs', '교육 프로그램'], ['gallery', '갤러리']];
+  const v = data?.value || {}; const sections: string[] = v.sections || ['hero', 'intro', 'news', 'programs', 'quicklinks', 'gallery'];
+  const all = [['hero', '히어로 (영상 배너 + 4개 분야)'], ['intro', '연구 분야 4개 카드'], ['news', '학과 소식 (공지/연구성과/수상 3줄 카드뉴스)'], ['programs', '교육 프로그램 타일'], ['quicklinks', '자주 찾는 메뉴'], ['gallery', '갤러리']];
   return (<div>
     <h1 className="text-2xl font-bold">메인 페이지 · 설정</h1>
     <form action={saveSettings} className="mt-6 max-w-2xl space-y-5 bg-white border border-sg-line p-6">
       <div><p className="text-[13px] font-semibold">메인에 표시할 섹션</p><div className="mt-2 grid gap-2 sm:grid-cols-2 text-[13px]">{all.map(([k, l]) => <label key={k} className="flex items-center gap-2"><input type="checkbox" name={`sec_${k}`} defaultChecked={sections.includes(k)} /> {l}</label>)}</div></div>
-      <label className="block text-[13px]">섹션 순서 (쉼표로 구분: hero, intro, news, quicklinks, programs, gallery)<input name="order" defaultValue={sections.join(', ')} className="input mt-1 font-mono" /></label>
-      <label className="block text-[13px]">메인 소식 탭당 표시 글 수<input name="news_count" type="number" min={3} max={12} defaultValue={v.news_count || 6} className="input mt-1 !w-24" /></label>
+      <label className="block text-[13px]">섹션 순서 (쉼표로 구분: hero, intro, news, programs, quicklinks, gallery)<input name="order" defaultValue={sections.join(', ')} className="input mt-1 font-mono" /></label>
+      <label className="block text-[13px]">메인 소식 줄당 카드 수 (4개씩 보이고 화살표로 넘김)<input name="news_count" type="number" min={4} max={16} defaultValue={v.news_count || 8} className="input mt-1 !w-24" /></label>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="block text-[13px]">히어로 배경 영상 URL (mp4)<input name="hero_video_url" defaultValue={v.hero_video_url || ''} className="input mt-1" placeholder="비우면 본교 캠퍼스 영상" /></label>
+        <label className="block text-[13px]">히어로 대체 이미지 URL<input name="hero_poster_url" defaultValue={v.hero_poster_url || ''} className="input mt-1" placeholder="비우면 학과 대표 사진" /></label>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block text-[13px]">히어로 문구 (한국어)<input name="tagline_ko" defaultValue={v.tagline_ko || ''} className="input mt-1" placeholder="비우면 기본 문구" /></label>
         <label className="block text-[13px]">Hero tagline (English)<input name="tagline_en" defaultValue={v.tagline_en || ''} className="input mt-1" /></label>

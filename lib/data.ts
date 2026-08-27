@@ -8,19 +8,18 @@ const safe = async <T,>(fn: () => Promise<{ data: T | null; error: any }>, fallb
 
 export async function getHomeData() {
   const sb = createPublicClient();
-  const [posts, gallery, banners, settings, facultyCount] = await Promise.all([
-    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,created_at,is_pinned')
+  const [posts, gallery, banners, settings] = await Promise.all([
+    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,created_at,is_pinned')
       .in('board', ['notice', 'research', 'award']).eq('published', true).eq('show_on_home', true)
-      .order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(60) as any, []),
-    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,thumbnail_url,images,created_at').eq('board', 'gallery').eq('published', true).order('created_at', { ascending: false }).limit(6) as any, []),
+      .order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(80) as any, []),
+    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,thumbnail_url,images,created_at').eq('board', 'gallery').eq('published', true).order('created_at', { ascending: false }).limit(8) as any, []),
     safe<any[]>(() => sb.from('banners').select('*').eq('visible', true).order('sort_order') as any, []),
     safe<any>(() => sb.from('site_settings').select('value').eq('key', 'home').single() as any, null),
-    safe<any>(() => sb.from('faculty').select('id', { count: 'exact', head: true }).eq('is_emeritus', false).eq('published', true) as any, null),
   ]);
-  const n = settings?.value?.news_count ?? 6;
+  const n = settings?.value?.news_count ?? 8;
   const groups: Record<string, Post[]> = { notice: [], research: [], award: [] };
   for (const p of posts) if (groups[p.board] && groups[p.board].length < n) groups[p.board].push(p);
-  return { groups, gallery, banners, settings: settings?.value ?? {}, facultyCount: 18 };
+  return { groups, gallery, banners, settings: settings?.value ?? {} };
 }
 
 export async function getPosts(board: string, page = 1, per = 15, q = '') {
@@ -33,28 +32,30 @@ export async function getPosts(board: string, page = 1, per = 15, q = '') {
   if (error) { console.error(error.message); return { posts: [] as Post[], total: 0 }; }
   return { posts: (data || []) as Post[], total: count || 0 };
 }
-
 export async function getPost(id: number) {
   const sb = createPublicClient();
   const { data } = await sb.from('posts').select('*').eq('id', id).eq('published', true).single();
   if (data) sb.rpc('increment_view', { post_id: id }).then(() => {});
   return data as Post | null;
 }
-
+export async function getAdjacent(board: string, id: number, created: string) {
+  const sb = createPublicClient();
+  const [{ data: prev }, { data: next }] = await Promise.all([
+    sb.from('posts').select('id,title_ko,title_en').eq('board', board).eq('published', true).lt('created_at', created).order('created_at', { ascending: false }).limit(1),
+    sb.from('posts').select('id,title_ko,title_en').eq('board', board).eq('published', true).gt('created_at', created).order('created_at', { ascending: true }).limit(1),
+  ]);
+  return { prev: prev?.[0] || null, next: next?.[0] || null };
+}
 export async function getFaculty(emeritus = false) {
   const sb = createPublicClient();
   const { data } = await sb.from('faculty').select('*').eq('is_emeritus', emeritus).eq('published', true).order('sort_order');
   return data || [];
 }
 export async function getFacultyOne(id: number) {
-  const sb = createPublicClient();
-  const { data } = await sb.from('faculty').select('*').eq('id', id).single();
-  return data;
+  const sb = createPublicClient(); const { data } = await sb.from('faculty').select('*').eq('id', id).single(); return data;
 }
 export async function getPage(slug: string) {
-  const sb = createPublicClient();
-  const { data } = await sb.from('pages').select('*').eq('slug', slug).maybeSingle();
-  return data;
+  const sb = createPublicClient(); const { data } = await sb.from('pages').select('*').eq('slug', slug).maybeSingle(); return data;
 }
 export async function getReservations(facility: string, year: number, month: number) {
   const sb = createPublicClient();

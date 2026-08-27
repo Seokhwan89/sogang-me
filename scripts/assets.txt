@@ -1,0 +1,1 @@
+SogangFont: https://www.sogang.ac.kr/intro/symbol/data/SOGANG_UNIVERSITY_for_windows.ttf

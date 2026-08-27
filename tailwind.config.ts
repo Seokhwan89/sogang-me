@@ -6,7 +6,15 @@ const config: Config = {
       colors: {
         sg: {
           red: 'var(--sg-red)',
-          deep: 'var(--sg-red-deep)',
+          cardinal: 'var(--sg-cardinal)',
+          deep: 'var(--sg-deep)',
+          gray9: 'var(--sg-gray9)',
+          gray11: 'var(--sg-gray11)',
+          blue: 'var(--sg-blue)',
+          teal: 'var(--sg-teal)',
+          green: 'var(--sg-green)',
+          orange: 'var(--sg-orange)',
+          purple: 'var(--sg-purple)',
           ink: 'var(--sg-ink)',
           steel: 'var(--sg-steel)',
           line: 'var(--sg-line)',
@@ -17,8 +25,9 @@ const config: Config = {
       fontFamily: {
         sans: ['Pretendard Variable', 'Pretendard', 'system-ui', 'sans-serif'],
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+        brand: ['SogangFont', 'Pretendard Variable', 'Pretendard', 'serif'],
       },
-      maxWidth: { site: '1240px' },
+      maxWidth: { site: '1320px' },
     },
   },
   plugins: [],
