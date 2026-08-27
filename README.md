@@ -88,4 +88,4 @@ Supabase SQL Editor에서 `supabase/schema_v3.sql` → `supabase/seed_v3.sql` �
 - **교수 위치**: 자유입력 → **건물 드롭다운 + 호실 번호**. 국문 "리치과학관(R) 618호", 영문 "New Ricci Hall (R) Room 618"로 자동 표기 (`lib/buildings.ts`, 영문명은 서강대 영문 홈페이지 표기 기준).
 - 메인 연구분야 카드 4개 높이 통일 (설명 길이가 달라도 대칭).
 - 영상·학술제 게시판의 분야(카테고리) 제목도 영문 페이지에서 영어로 표시 (`category_en`).
-- DB: `supabase/schema_v6.sql` 실행 필요 (기존 office 문자열에서 건물/호실 자동 분리).
+- DB: `supabase/schema_v6.sql` 실행 필요 (기존 office 문자열에서 건물/호실 자동 분리)..
