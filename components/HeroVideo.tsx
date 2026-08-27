@@ -46,7 +46,7 @@ export default function HeroVideo({ locale, videoUrl, poster, taglineKo, tagline
               <E className="w-[92px] h-[64px] shrink-0 text-white/90" />
               <div>
                 <p className="font-bold text-[16px] md:text-[17px] leading-tight">{ko ? a.ko : a.en}</p>
-                <p className="mt-1 text-[12.5px] text-white/60 group-hover:text-white/85">{ko ? a.en : a.ko}</p>
+                {ko && <p className="mt-1 text-[12.5px] text-white/60 group-hover:text-white/85">{a.en}</p>}
               </div>
             </Link>
           ); })}

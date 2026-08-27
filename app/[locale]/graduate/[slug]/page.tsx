@@ -32,7 +32,7 @@ export default async function Grad({ params }: { params: { locale: Locale; slug:
                   {E && <div className="w-[110px] h-[74px] shrink-0" style={{ color }}><E className="w-full h-full" /></div>}
                   <div>
                     <h2 className="font-brand text-[1.7rem] md:text-[2.1rem] leading-tight">{ko ? a.ko : a.en}</h2>
-                    <p className="text-[13.5px] text-sg-gray9 mt-1">{ko ? a.en : a.ko} · {labs.length}{ko ? '개 연구실' : ' laboratories'}</p>
+                    <p className="text-[13.5px] text-sg-gray9 mt-1">{ko ? `${a.en} · ${labs.length}개 연구실` : `${labs.length} ${labs.length === 1 ? 'laboratory' : 'laboratories'}`}</p>
                   </div>
                 </div>
                 <p className="mt-4 text-[15.5px] leading-relaxed text-[#2a2d33]">{ko ? a.descKo : a.descEn}</p>
@@ -46,7 +46,7 @@ export default async function Grad({ params }: { params: { locale: Locale; slug:
                         <tr key={f.id} className="border-b border-sg-line align-top">
                           <td className="py-3 pr-3">
                             {f.lab_url ? <a href={f.lab_url} target="_blank" rel="noreferrer" className="font-semibold hover:text-sg-cardinal">{ko ? f.lab_ko : f.lab_en || f.lab_ko}</a> : <span className="font-semibold">{ko ? f.lab_ko : f.lab_en || f.lab_ko}</span>}
-                            <span className="block text-[12.5px] text-sg-gray9">{ko ? f.lab_en : f.lab_ko}</span>
+                            {ko && f.lab_en && <span className="block text-[12.5px] text-sg-gray9">{f.lab_en}</span>}
                           </td>
                           <td className="py-3 pr-3 whitespace-nowrap"><Link href={`/${l}/faculty/${f.id}`} className="hover:text-sg-cardinal">{ko ? f.name_ko : f.name_en || f.name_ko}</Link></td>
                           <td className="py-3 pr-3 text-[13.5px]">{formatOffice(f, ko)}</td>
