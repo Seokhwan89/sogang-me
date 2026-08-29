@@ -42,11 +42,11 @@ export default function HeroVideo({ locale, videoUrl, poster, taglineKo, tagline
         {/* Four fields strip */}
         <div className="mt-14 md:mt-20 grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/15 border border-white/15 backdrop-blur-sm rise rise-4">
           {areas.map((a, i) => { const E = Em[i]; return (
-            <Link key={a.id} href={`/${locale}/graduate/areas#${a.id}`} className="group bg-sg-ink/40 hover:bg-sg-cardinal/80 transition-colors p-5 flex items-center gap-4">
-              <E className="w-[92px] h-[64px] shrink-0 text-white/90" />
-              <div>
-                <p className="font-bold text-[16px] md:text-[17px] leading-tight">{ko ? a.ko : a.en}</p>
-                {ko && <p className="mt-1 text-[12.5px] text-white/60 group-hover:text-white/85">{a.en}</p>}
+            <Link key={a.id} href={`/${locale}/graduate/areas#${a.id}`} className="group bg-sg-ink/40 hover:bg-sg-cardinal/80 transition-colors p-4 md:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <E className="w-[64px] h-[44px] md:w-[92px] md:h-[64px] shrink-0 text-white/90" />
+              <div className="min-w-0">
+                <p className="font-bold text-[15px] md:text-[17px] leading-tight break-keep">{ko ? a.ko : a.en}</p>
+                {ko && <p className="mt-1 text-[12px] md:text-[12.5px] text-white/60 break-keep group-hover:text-white/85">{a.en}</p>}
               </div>
             </Link>
           ); })}
