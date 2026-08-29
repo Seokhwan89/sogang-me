@@ -37,7 +37,31 @@ export default async function UG({ params }: { params: { locale: Locale; slug: s
         <p className="mt-4 text-[17px] leading-relaxed text-sg-gray11 max-w-3xl">{ko ? '기계공학은 설계·역학, 열·유체, 제어·진동·로보틱스, 생산·제조라는 네 기둥 위에 서 있습니다. 각 분야는 고유한 학문 체계를 바탕으로 자동차, 항공우주, 에너지, 반도체, 바이오 등 모든 산업을 떠받치며, 네 분야가 만나 로봇과 Physical AI 같은 융합 영역으로 확장됩니다.' : 'Mechanical engineering stands on four pillars — design and mechanics, thermal and fluids, control-vibration-robotics, and manufacturing. Each is a discipline in its own right, underpinning every industry from automotive and aerospace to energy, semiconductors and bio, and together they converge into fields such as robotics and Physical AI.'}</p>
         <div className="mt-10 border border-sg-line bg-sg-mist/40 p-5 md:p-10">
           <div className="max-w-xl mx-auto bg-sg-ink text-white text-center px-6 py-5">
-            <p className="font-brand text-[1.35rem] md:text-[1.6rem] leading-tight">Physical AI</p>
+            <div className="flex items-center justify-center gap-3">
+              <svg viewBox="0 0 48 48" className="w-9 h-9 md:w-11 md:h-11 shrink-0" aria-hidden>
+                <g stroke="currentColor" strokeWidth=".7" opacity=".35">
+                  <line x1="9" y1="12" x2="24" y2="9" /><line x1="9" y1="12" x2="24" y2="24" /><line x1="9" y1="12" x2="24" y2="39" />
+                  <line x1="9" y1="24" x2="24" y2="9" /><line x1="9" y1="24" x2="24" y2="24" /><line x1="9" y1="24" x2="24" y2="39" />
+                  <line x1="9" y1="36" x2="24" y2="9" /><line x1="9" y1="36" x2="24" y2="24" /><line x1="9" y1="36" x2="24" y2="39" />
+                  <line x1="24" y1="9" x2="39" y2="18" /><line x1="24" y1="9" x2="39" y2="30" />
+                  <line x1="24" y1="24" x2="39" y2="18" /><line x1="24" y1="24" x2="39" y2="30" />
+                  <line x1="24" y1="39" x2="39" y2="18" /><line x1="24" y1="39" x2="39" y2="30" />
+                </g>
+                <g fill="currentColor">
+                  <circle cx="9" cy="12" r="2.4"><animate attributeName="opacity" values=".55;1;.55" dur="2.4s" begin="0s" repeatCount="indefinite" /></circle>
+                  <circle cx="9" cy="24" r="2.4"><animate attributeName="opacity" values=".55;1;.55" dur="2.4s" begin=".4s" repeatCount="indefinite" /></circle>
+                  <circle cx="9" cy="36" r="2.4"><animate attributeName="opacity" values=".55;1;.55" dur="2.4s" begin=".8s" repeatCount="indefinite" /></circle>
+                  <circle cx="24" cy="9" r="2.4"><animate attributeName="opacity" values=".55;1;.55" dur="2.4s" begin=".6s" repeatCount="indefinite" /></circle>
+                  <circle cx="24" cy="24" r="2.4"><animate attributeName="opacity" values=".55;1;.55" dur="2.4s" begin="1s" repeatCount="indefinite" /></circle>
+                  <circle cx="24" cy="39" r="2.4"><animate attributeName="opacity" values=".55;1;.55" dur="2.4s" begin="1.4s" repeatCount="indefinite" /></circle>
+                  <circle cx="39" cy="18" r="2.4"><animate attributeName="opacity" values=".55;1;.55" dur="2.4s" begin="1.2s" repeatCount="indefinite" /></circle>
+                  <circle cx="39" cy="30" r="2.4"><animate attributeName="opacity" values=".55;1;.55" dur="2.4s" begin="1.6s" repeatCount="indefinite" /></circle>
+                </g>
+                <circle r="1.4" fill="#d86018"><animateMotion dur="2.4s" repeatCount="indefinite" path="M9 12 L24 24 L39 18" /></circle>
+                <circle r="1.4" fill="#d86018"><animateMotion dur="3s" begin="1.1s" repeatCount="indefinite" path="M9 36 L24 9 L39 30" /></circle>
+              </svg>
+              <p className="font-brand text-[1.35rem] md:text-[1.6rem] leading-tight">Physical AI</p>
+            </div>
             <p className="mt-1.5 text-[13.5px] md:text-[14px] leading-relaxed text-white/80 break-keep">{ko ? '실제 세계에서 작동하는 지능형 기계 — 디지털 지능과 기계공학 하드웨어가 하나의 시스템으로 만납니다.' : 'Intelligent machines that work in the real world — digital intelligence and mechanical hardware meet as one system.'}</p>
           </div>
           <div className="hidden md:block h-6 w-px mx-auto" style={{ backgroundColor: 'rgba(26,26,26,.3)' }} />
