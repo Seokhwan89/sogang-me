@@ -35,7 +35,10 @@ export default async function UG({ params }: { params: { locale: Locale; slug: s
         <p className="eyebrow">{ko ? '전공소개' : 'Major Fields'}</p>
         <h2 className="h-section mt-2">{ko ? '기계공학의 네 가지 기초 분야' : 'Four foundational fields of mechanical engineering'}</h2>
         <p className="mt-4 text-[17px] leading-relaxed text-sg-gray11 max-w-3xl">{ko ? '기계공학은 설계·역학, 열·유체, 제어·진동·로보틱스, 생산·제조라는 네 기둥 위에 서 있습니다. 각 분야는 고유한 학문 체계를 바탕으로 자동차, 항공우주, 에너지, 반도체, 바이오 등 모든 산업을 떠받치며, 네 분야가 만나 로봇과 Physical AI 같은 융합 영역으로 확장됩니다.' : 'Mechanical engineering stands on four pillars — design and mechanics, thermal and fluids, control-vibration-robotics, and manufacturing. Each is a discipline in its own right, underpinning every industry from automotive and aerospace to energy, semiconductors and bio, and together they converge into fields such as robotics and Physical AI.'}</p>
-        <img src="/images/intro/physical-ai-overview.jpg" alt={ko ? '기계공학 전공 분야 개관 (Physical AI 소개자료)' : 'Overview of mechanical engineering fields'} className="mt-8 w-full border border-sg-line" />
+        <div className="mt-8 bg-sg-ink text-white p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-3 md:gap-8">
+          <p className="font-brand text-[1.25rem] md:text-[1.45rem] leading-tight shrink-0">Physical AI</p>
+          <p className="text-[14.5px] md:text-[15px] leading-relaxed text-white/85 break-keep">{ko ? 'Physical AI는 디지털 지능을 물리적 실체로 구현하는 종합 시스템 기술입니다. 아래 네 기초 분야의 깊이가 모여 실제 세계에서 작동하는 지능형 기계를 완성합니다.' : 'Physical AI embodies digital intelligence in the physical world. The depth of the four foundational fields below comes together to complete intelligent machines that work in reality.'}</p>
+        </div>
       </div>
       <div className="mt-16 space-y-10">
         {majorFields.map((f, i) => { const E = emblemOf[f.id]; return (
