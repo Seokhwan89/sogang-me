@@ -40,9 +40,9 @@ export default async function UG({ params }: { params: { locale: Locale; slug: s
             <p className="font-brand text-[1.35rem] md:text-[1.6rem] leading-tight">Physical AI</p>
             <p className="mt-1.5 text-[13.5px] md:text-[14px] leading-relaxed text-white/80 break-keep">{ko ? '실제 세계에서 작동하는 지능형 기계 — 디지털 지능과 기계공학 하드웨어가 하나의 시스템으로 만납니다.' : 'Intelligent machines that work in the real world — digital intelligence and mechanical hardware meet as one system.'}</p>
           </div>
-          <div className="hidden md:block h-6 w-px bg-sg-ink/25 mx-auto" />
-          <div className="hidden md:block h-px bg-sg-ink/25 mx-[12.5%]" />
-          <div className="hidden md:grid grid-cols-4">{[0, 1, 2, 3].map((n) => <div key={n} className="h-6 w-px bg-sg-ink/25 mx-auto" />)}</div>
+          <div className="hidden md:block h-6 w-px mx-auto" style={{ backgroundColor: 'rgba(26,26,26,.3)' }} />
+          <div className="hidden md:block h-px mx-[12.5%]" style={{ backgroundColor: 'rgba(26,26,26,.3)' }} />
+          <div className="hidden md:grid grid-cols-4">{[0, 1, 2, 3].map((n) => <div key={n} className="h-6 w-px mx-auto" style={{ backgroundColor: 'rgba(26,26,26,.3)' }} />)}</div>
           <div className="mt-5 md:mt-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {(ko ? [
               { id: 'design', name: '설계 · 역학', role: '골격과 근육', desc: '하중을 견디고 정밀하게 움직이는 몸체와 구동 구조를 설계합니다.' },
