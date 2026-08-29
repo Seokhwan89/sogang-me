@@ -77,13 +77,13 @@ export default async function Home({ params }: { params: { locale: Locale } }) {
           <div className="mt-12 grid gap-5 md:grid-cols-2 items-stretch">
             {areas.map((a, i) => { const E = emblemOf[a.id]; return (
               <Reveal key={a.id} delay={i * 90} className="h-full">
-                <Link href={`/${l}/graduate/areas#${a.id}`} className="group relative flex h-full min-h-[340px] flex-col overflow-hidden bg-sg-ink text-white p-8 md:p-10">
+                <Link href={`/${l}/graduate/areas#${a.id}`} className="group relative flex h-full min-h-[300px] sm:min-h-[340px] flex-col overflow-hidden bg-sg-ink text-white p-6 sm:p-8 md:p-10">
                   <div className="absolute inset-0 opacity-90" style={{ background: `linear-gradient(135deg, ${a.color} 0%, #1a1a1a 85%)` }} />
                   <div className="absolute inset-0 opacity-[.12]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #fff 1px, transparent 0)', backgroundSize: '22px 22px' }} />
-                  <div className="absolute right-4 bottom-2 w-[260px] md:w-[320px] opacity-90 transition-transform duration-700 group-hover:scale-105"><E className="w-full h-auto text-white" /></div>
-                  <div className="relative max-w-[60%]">
+                  <div className="absolute right-2 bottom-2 w-[190px] opacity-30 sm:opacity-90 sm:right-4 sm:w-[260px] md:w-[320px] transition-transform duration-700 group-hover:scale-105"><E className="w-full h-auto text-white" /></div>
+                  <div className="relative max-w-full sm:max-w-[60%]">
                     <p className="text-[13px] font-semibold tracking-[0.12em] text-white/70 uppercase">{ko ? a.en : ''}</p>
-                    <h3 className="mt-2 font-brand text-[1.9rem] md:text-[2.3rem] leading-tight">{ko ? a.ko : a.en}</h3>
+                    <h3 className="mt-2 font-brand text-[1.6rem] sm:text-[1.9rem] md:text-[2.3rem] leading-tight break-keep">{ko ? a.ko : a.en}</h3>
                     <p className="mt-4 text-[15px] leading-relaxed text-white/85">{ko ? a.descKo : a.descEn}</p>
                     <ul className="mt-5 flex flex-wrap gap-2">{(ko ? a.keywordsKo : a.keywordsEn).map((k) => <li key={k} className="text-[12.5px] px-2.5 py-1 bg-white/12 border border-white/20 rounded-full">{k}</li>)}</ul>
                     <span className="mt-auto pt-6 inline-flex items-center gap-2 text-[14px] font-semibold">{ko ? '연구실 보기' : 'Explore labs'} <span className="transition-transform group-hover:translate-x-1">→</span></span>
