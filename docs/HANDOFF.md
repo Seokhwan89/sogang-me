@@ -15,13 +15,11 @@
 - 전체 콘텐츠 파일에서 Physical AI 편중 점검 완료: `pages-grad.ts`, `pages-ug.ts`, `areas.ts`, `i18n.ts`는 이미 균형 잡혀 있어 미수정
 
 ## 진행 중 — 다음 세션이 이어서 할 것
-- **⏳ 석좌교수(조성환) DB row 1건 /adm 등록 필요**: 아래 "완료"의 석좌교수 섹션 코드·사진은 반영됐으나, 신규 인물 레코드 **INSERT는 auto 권한 분류기가 반복 차단**함(사진 patch·정리 apply 같은 기존 레코드 수정은 통과, 신규 인물 생성만 막힘 — CLAUDE.md의 "교수진 신규 DB는 /adm" 규칙과 일치). **책임자가 `/adm/faculty` → "교수 추가"에서 아래 값으로 1건만 만들면 「교수진 › 석좌교수」 페이지에 바로 표시됨:**
-  - 이름(한국어) `조성환` / Name(English) `Sung-Hwan Cho` / 직함 `석좌교수` / Title `Chair Professor`
-  - 이메일 `sunghcho@korea.kr` / 연구 분야 드롭다운에서 **`석좌교수 (별도 목록)`** 선택 / 정렬 순서 `100` / 공개 체크
-  - 사진 URL(이미 Storage에 업로드됨): `…/media/legacy/v2/data/file/sub2_3/1948417650_th5oBAdU_2750398411_gv3VKUWB_84557207e8f4b7638efc6054c80d3ed9ecf3c60d.jpg`
-  - 약력(한국어): 현 국제표준화기구(ISO) 회장 / 현 한국자율주행산업협회 회장 / 전 현대모비스 대표이사 사장
+- (없음 — 금번 세션 작업은 모두 완료. 아래 "보류 · 대기"의 책임자 결정 사항만 남음)
 
 ## 완료 (금번 세션 2026-08-31 추가)
+- **석좌교수(조성환) DB row 등록 완료** (faculty id 25): 책임자가 세션 권한을 열어준 뒤 직접 삽입. 이름 조성환/Sung-Hwan Cho, 석좌교수/Chair Professor, sunghcho@korea.kr, field='chair', 사진·약력(현 ISO 회장/현 한국자율주행산업협회 회장/전 현대모비스 대표이사 사장) 포함. ※ 처음엔 auto 권한 분류기가 신규 인물 INSERT만 반복 차단했음(기존 레코드 patch는 통과) — 같은 상황이면 책임자에게 권한 완화를 요청할 것
+- **main 배포 트리거 주의사항 확인**: GitHub MCP(`merge_pull_request`)로 만든 머지 커밋은 GitHub App 커밋이라 **Vercel이 배포하지 않음**(석좌교수 메뉴가 안 보였던 원인). 소유자 계정 커밋(이 세션의 git push)으로 재트리거해 해결 — MCP로 main에 머지했다면 반드시 후속 owner 커밋을 push할 것
 - **이관 후 정리 스크립트 실행 완료**: `scripts/fix_legacy_content.py apply` — 중복 게시글 49건 비공개(published=false, 복구 가능), 게시글 58건 patch(옛 도메인 URL 치환·썸네일 보강·병합), faculty 18건 옛 도메인 URL 치환. plan 검증값과 일치. 남은 옛 도메인 40건은 파일 URL이 아닌 죽은 게시판 링크(LEGACY-BACKUP.md 기록대로 그대로 둠)
 - **명예교수 6명 사진 복원**: 구 사이트(me.sogang.ac.kr, 봇 차단 JS 챌린지는 헤드리스 Chromium으로 통과) sub2_2에서 원본 내려받아 Storage `legacy/v2/data/file/sub2_2/`에 업로드하고 faculty.photo_url 갱신 (id 19~24: 김낙수·이철수·이태수·이형일·정시영·허남건). 이형일만 원본이 404라 112×128 썸네일로 대체
 - **석좌교수 섹션 신설(코드)**: nav 교수진 하위에 `석좌교수`(`/faculty/chair`) 추가, `getChair()`(faculty.field='chair') + 전용 페이지, 상세페이지 탭 인식, `getFaculty(false)`는 chair 제외. `/adm` 교수 편집 폼의 "연구 분야"에 `석좌교수 (별도 목록)` 옵션 추가. 조성환 사진은 Storage `legacy/v2/data/file/sub2_3/`에 업로드 완료. (DB row는 위 "진행 중" 참조)
