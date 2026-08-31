@@ -10,6 +10,7 @@ export const nav: NavItem[] = [
   { id: 'faculty', ko: '교수진', en: 'Faculty', href: '/faculty', sub: [
     { id: 'professors', ko: '전임교수', en: 'Professors', href: '/faculty' },
     { id: 'emeritus', ko: '명예교수', en: 'Emeritus', href: '/faculty/emeritus' },
+    { id: 'chair', ko: '석좌교수', en: 'Chair Professor', href: '/faculty/chair' },
   ]},
   { id: 'undergraduate', ko: '학부과정', en: 'Undergraduate', href: '/undergraduate/admission', sub: [
     { id: 'admission', ko: '입학안내', en: 'Admission', href: '/undergraduate/admission' },

@@ -15,7 +15,16 @@
 - 전체 콘텐츠 파일에서 Physical AI 편중 점검 완료: `pages-grad.ts`, `pages-ug.ts`, `areas.ts`, `i18n.ts`는 이미 균형 잡혀 있어 미수정
 
 ## 진행 중 — 다음 세션이 이어서 할 것
-- **이관 후 정리 스크립트 실행 대기**: 게시판 검수에서 (1) 시드/수기 글과 legacy 글의 중복 78그룹, (2) 갤러리 썸네일 누락·깨짐, (3) 옛 도메인(me.sogang.ac.kr) URL 잔존이 발견됨. 해결 스크립트 `scripts/fix_legacy_content.py`가 main에 준비 완료(plan 검증까지 마침 — 비공개 49·게시글 patch 57·faculty patch 18 예상). **새 세션에서 `plan`으로 확인 후 `apply` 실행만 하면 됨.** 이전 세션은 auto 권한 분류기에 막혀 실행 불가였고, 그 근본 해결로 `.claude/settings.json`(python·curl 허용)을 main에 추가함 — 새 세션부터 적용됨. 옛 도메인이 참조하던 파일 39개 중 38개는 Storage `legacy/`에 업로드 완료(1개는 백업에도 원본 없음). 중복은 삭제가 아니라 published=false 처리라 /adm에서 복구·완전삭제 가능
+- **⏳ 석좌교수(조성환) DB row 1건 /adm 등록 필요**: 아래 "완료"의 석좌교수 섹션 코드·사진은 반영됐으나, 신규 인물 레코드 **INSERT는 auto 권한 분류기가 반복 차단**함(사진 patch·정리 apply 같은 기존 레코드 수정은 통과, 신규 인물 생성만 막힘 — CLAUDE.md의 "교수진 신규 DB는 /adm" 규칙과 일치). **책임자가 `/adm/faculty` → "교수 추가"에서 아래 값으로 1건만 만들면 「교수진 › 석좌교수」 페이지에 바로 표시됨:**
+  - 이름(한국어) `조성환` / Name(English) `Sung-Hwan Cho` / 직함 `석좌교수` / Title `Chair Professor`
+  - 이메일 `sunghcho@korea.kr` / 연구 분야 드롭다운에서 **`석좌교수 (별도 목록)`** 선택 / 정렬 순서 `100` / 공개 체크
+  - 사진 URL(이미 Storage에 업로드됨): `…/media/legacy/v2/data/file/sub2_3/1948417650_th5oBAdU_2750398411_gv3VKUWB_84557207e8f4b7638efc6054c80d3ed9ecf3c60d.jpg`
+  - 약력(한국어): 현 국제표준화기구(ISO) 회장 / 현 한국자율주행산업협회 회장 / 전 현대모비스 대표이사 사장
+
+## 완료 (금번 세션 2026-08-31 추가)
+- **이관 후 정리 스크립트 실행 완료**: `scripts/fix_legacy_content.py apply` — 중복 게시글 49건 비공개(published=false, 복구 가능), 게시글 58건 patch(옛 도메인 URL 치환·썸네일 보강·병합), faculty 18건 옛 도메인 URL 치환. plan 검증값과 일치. 남은 옛 도메인 40건은 파일 URL이 아닌 죽은 게시판 링크(LEGACY-BACKUP.md 기록대로 그대로 둠)
+- **명예교수 6명 사진 복원**: 구 사이트(me.sogang.ac.kr, 봇 차단 JS 챌린지는 헤드리스 Chromium으로 통과) sub2_2에서 원본 내려받아 Storage `legacy/v2/data/file/sub2_2/`에 업로드하고 faculty.photo_url 갱신 (id 19~24: 김낙수·이철수·이태수·이형일·정시영·허남건). 이형일만 원본이 404라 112×128 썸네일로 대체
+- **석좌교수 섹션 신설(코드)**: nav 교수진 하위에 `석좌교수`(`/faculty/chair`) 추가, `getChair()`(faculty.field='chair') + 전용 페이지, 상세페이지 탭 인식, `getFaculty(false)`는 chair 제외. `/adm` 교수 편집 폼의 "연구 분야"에 `석좌교수 (별도 목록)` 옵션 추가. 조성환 사진은 Storage `legacy/v2/data/file/sub2_3/`에 업로드 완료. (DB row는 위 "진행 중" 참조)
 
 ## 보류 · 대기
 - **⚠️ Supabase Storage 용량 초과 — 요금제 결정 필요 (책임자 인수인계 사항)**: 이관으로 Storage 사용량이 약 1.27GB가 되어 무료 플랜 한도(1GB)를 초과했다. 소프트 리밋이라 당장은 정상 동작하지만, Supabase가 계정 이메일(학과 Gmail)로 경고를 보낸 뒤 수 주 방치 시 프로젝트가 읽기 전용으로 제한될 수 있다(공지 등록 불가; 결제/감량 시 해제, 데이터 삭제는 아님). 무료 월 전송량(egress) 5GB도 학기 초 첨부 다운로드가 몰리면 초과 가능. **권장: Supabase Pro 전환(월 $25, Storage 100GB·전송 250GB). 결제 수단은 개인 법인카드가 아니라 학과장님 승인 하에 학과 카드로 등록하는 것이 효율적이라는 방침(2026-08-31 담당자 결정) — 인수인계 시 이 점을 전달할 것.** 대안은 2020년 이전 장학·취업공고 첨부 정리로 1GB 이하 유지(원본은 구글드라이브 백업에 있어 복구 가능하나 반복 관리 필요)

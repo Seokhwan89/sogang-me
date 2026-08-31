@@ -29,7 +29,7 @@ export default async function EditFaculty({ params }: { params: { id: string } }
           <I n="lab_ko" l="연구실명 (한국어)" v={f?.lab_ko} /><I n="lab_en" l="Laboratory (English)" v={f?.lab_en} />
           <I n="lab_url" l="연구실 홈페이지" v={f?.lab_url} ph="https://" /><label className="block text-[13px]">건물<select name="building" defaultValue={curBuilding} className="input mt-1"><option value="">— 선택 —</option>{buildings.map((b) => <option key={b.code} value={b.code}>{b.ko} ({b.code})</option>)}</select></label>
           <label className="block text-[13px]">호실<input name="room" defaultValue={curRoom} placeholder="618" className="input mt-1" /><span className="block text-[11px] text-sg-steel mt-1">숫자만 입력 (국문 "리치과학관(R) 618호" / 영문 "New Ricci Hall (R) Room 618"로 자동 표기)</span></label>
-          <label className="block text-[13px]">연구 분야<select name="field" defaultValue={f?.field || ''} className="input mt-1"><option value="">—</option>{areas.map((a) => <option key={a.id} value={a.id}>{a.ko}</option>)}</select></label>
+          <label className="block text-[13px]">연구 분야<select name="field" defaultValue={f?.field || ''} className="input mt-1"><option value="">—</option>{areas.map((a) => <option key={a.id} value={a.id}>{a.ko}</option>)}<option value="chair">석좌교수 (별도 목록)</option></select></label>
           <I n="sort_order" l="정렬 순서 (작을수록 앞)" v={String(f?.sort_order ?? 100)} />
         </div>
       </div>
@@ -38,7 +38,7 @@ export default async function EditFaculty({ params }: { params: { id: string } }
         <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 text-[13px]">
           {researchGroupDefs.map((g) => <label key={g.id} className="flex items-center gap-2"><input type="checkbox" name={`group_${g.id}`} defaultChecked={Array.isArray(f?.groups) && f.groups.includes(g.id)} /> {g.ko}</label>)}
         </div>
-        <p className="mt-2 text-[12px] text-sg-steel">※ 위 "연구 분야"(4개 기초전공분야)는 「기초전공분야」 페이지의 연구실 표에 자동 반영됩니다. 퇴직 시에는 아래 "명예교수"를 체크하면 모든 목록에서 자동으로 이동합니다.</p>
+        <p className="mt-2 text-[12px] text-sg-steel">※ 위 "연구 분야"(4개 기초전공분야)는 「기초전공분야」 페이지의 연구실 표에 자동 반영됩니다. 퇴직 시에는 아래 "명예교수"를 체크하면 모든 목록에서 자동으로 이동합니다. "석좌교수"를 고르면 전임교수 목록에서 빠지고 「교수진 › 석좌교수」 페이지에만 표시됩니다.</p>
       </div>
       <div><p className="text-[13px] mb-1">연구분야 소개 (한국어)</p><RichEditor name="research_ko" defaultValue={f?.research_ko || ''} folder="faculty" minHeight={176} /></div>
       <div><p className="text-[13px] mb-1">Research (English)</p><RichEditor name="research_en" defaultValue={f?.research_en || ''} folder="faculty" minHeight={132} /></div>

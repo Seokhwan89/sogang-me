@@ -51,7 +51,16 @@ export async function getAdjacent(board: string, id: number, created: string) {
 }
 export async function getFaculty(emeritus = false) {
   const sb = createPublicClient();
-  const { data } = await sb.from('faculty').select('*').eq('is_emeritus', emeritus).eq('published', true).order('sort_order');
+  let query = sb.from('faculty').select('*').eq('is_emeritus', emeritus).eq('published', true);
+  // 석좌교수(field='chair')는 전임교수 목록에서 제외하고 전용 페이지에서만 노출한다.
+  if (!emeritus) query = query.or('field.is.null,field.neq.chair');
+  const { data } = await query.order('sort_order');
+  return data || [];
+}
+/** 석좌교수(Chair Professor) 목록 — field='chair'로 구분한다. */
+export async function getChair() {
+  const sb = createPublicClient();
+  const { data } = await sb.from('faculty').select('*').eq('field', 'chair').eq('published', true).order('sort_order');
   return data || [];
 }
 export async function getFacultyOne(id: number) {
