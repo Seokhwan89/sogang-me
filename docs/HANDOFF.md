@@ -43,4 +43,8 @@
 ## 외부에 요청해 둔 것
 - 없음
 
-> ⚠️ **Vercel 프로덕션 배포 중단 — 책임자 대시보드 확인 필요 (2026-08-31 08:22Z 기준)**: main에 5개 커밋(19e418f~8ab8d82)을 푸시했고 GitHub에는 각각 "Deployment completed" 기록이 생기지만, **프로덕션은 계속 옛 빌드를 서빙** 중이다(신규 석좌교수 페이지 40분+ 미반영). 커밋 author를 소유자로 바꿔도(8ab8d82) 동일 → author 문제 아님. 컨테이너에서 확인 가능한 범위는 소진. **책임자가 vercel.com/sg-office/sogang-me → Deployments에서 최근 배포 상태(Queued/Error/Canceled?)와 팀(sg-office) Pro 트라이얼 만료·결제·빌드 한도 여부를 확인할 것.** 원인 해소 시 이미 푸시된 main이 그대로 배포되므로 재푸시 불필요. 참고: 06시 이후 커밋은 전부 문서/스크립트여서 화면으로 배포 성공을 검증한 마지막 시점은 그 이전(전공소개 개편)이다 — 중단 시점이 오늘 이전일 수 있음.
+> ✅ **Vercel 배포 문제 해결 완료 (2026-08-31, 책임자와 함께 처리)** — 향후 세션 필독:
+> - **원인**: Vercel에 프로젝트가 2개였다. ① 옛 프로젝트 `sogang-me-old`(팀 "Sogang ME", seokhwan89 계정) — `sogang-me.vercel.app` 도메인 보유, env 정상, 그러나 Git 연결이 없어 새 커밋 미배포. ② 새 프로젝트 `sogang-me`(팀 "SG office", sgmeoffice-hub 계정) — 리포와 연결돼 모든 커밋을 빌드했지만, env가 옛 프로젝트의 Secret(값 복사 불가) 미리보기 문자열로 잘려 들어가 있어 DB 데이터가 전부 빈 화면이었다.
+> - **조치**: 새 프로젝트 env를 Supabase 대시보드의 실제 키로 재설정(`NEXT_PUBLIC_SUPABASE_URL`·`NEXT_PUBLIC_SUPABASE_ANON_KEY`는 **Config 타입**으로 재생성 — Secret 타입은 NEXT_PUBLIC_ 접두사와 함께 저장 불가, `SUPABASE_SERVICE_ROLE_KEY`는 Secret으로 신규 추가) → Redeploy → `sogang-me.vercel.app` 도메인을 옛 프로젝트에서 제거하고 새 프로젝트로 이전. 전 항목 검증 완료(석좌교수·게시판 668건·명예교수 사진·/adm).
+> - **남은 권장**: 옛 프로젝트 `sogang-me-old`는 혼동 방지를 위해 삭제 권장(책임자 판단). 새 프로젝트의 `SUPABASE_SERVICE_ROLE_KEY`는 Production에만 걸려 있음 — Preview 배포에서 서버 기능이 필요하면 Preview에도 추가.
+> - **교훈**: 이 리포의 배포 대상은 이제 팀 "SG office"의 `sogang-me` 프로젝트다. GitHub App(MCP) 머지 커밋도 배포가 트리거되니 author 조작은 불필요. Vercel env의 Secret 타입 값은 대시보드에서 복사할 수 없으므로 이전 시 반드시 원본(Supabase 등)에서 가져올 것.
