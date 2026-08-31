@@ -3,7 +3,7 @@ import { setReservation, addReservation } from '@/app/admin/actions';
 import { facilities } from '@/lib/nav';
 export default async function ReservationsAdmin({ searchParams }: { searchParams: { f?: string } }) {
   const sb = createClient();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST 기준 오늘 (서버는 UTC)
   const { data: pending } = await sb.from('reservations').select('*').eq('status', 'pending').order('date');
   /* 승인 대기 건이 이미 확정된 예약과 겹치는지 미리 계산해 경고합니다. */
   const { data: approvedAll } = await sb.from('reservations').select('id,facility,date,start_time,end_time,user_name').eq('status', 'approved');

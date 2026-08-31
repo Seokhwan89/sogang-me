@@ -11,7 +11,7 @@ export default async function FacultyAdmin() {
       <tbody>{(data || []).map((f: any) => <tr key={f.id} className="border-t border-sg-line hover:bg-sg-mist/60">
         <td className="p-3 font-mono text-sg-steel">{f.sort_order}</td>
         <td className="p-3"><Link href={`${b}/faculty/${f.id}`} className="font-medium hover:text-sg-red">{f.name_ko}</Link> <span className="text-sg-steel">{f.name_en}</span>{!f.published && <span className="ml-2 text-[11px] text-sg-steel">(비공개)</span>}</td>
-        <td className="p-3">{f.lab_ko}</td><td className="p-3 text-sg-steel">{f.office}</td><td className="p-3 font-mono text-[11px]">{f.field}</td><td className="p-3 font-mono text-[11px]">{Array.isArray(f.groups) ? f.groups.length : 0}</td><td className="p-3">{f.is_emeritus ? '명예교수' : '전임교수'}</td></tr>)}</tbody>
+        <td className="p-3">{f.lab_ko}</td><td className="p-3 text-sg-steel">{f.office}</td><td className="p-3 font-mono text-[11px]">{f.field}</td><td className="p-3 font-mono text-[11px]">{Array.isArray(f.groups) ? f.groups.length : 0}</td><td className="p-3">{f.is_emeritus ? '명예교수' : f.field === 'chair' ? '석좌교수' : '전임교수'}</td></tr>)}</tbody>
     </table>
   </div>);
 }
