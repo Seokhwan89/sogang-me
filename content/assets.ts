@@ -4,7 +4,8 @@
  *  hero-design=mixkit #46952(전투기 저공비행), hero-thermal=#154(잉크 유동), hero-control=#47257(산업 로봇),
  *  page-entrance=#5900(캠퍼스), page-research=#17456(실험 튜브),
  *  page-festival=#48166(강의실 팀활동), page-industry=#47257, page-ureca=#23618(연구실 현미경). */
-const media = 'https://pvdobbplxndsigatnamu.supabase.co/storage/v1/object/public/media/legacy';
+// legacy 미디어는 Cloudflare R2로 이전(2026-09-01) — Supabase 무료 한도(1GB) 대응. 신규 업로드는 계속 Supabase.
+const media = 'https://pub-752d1dfed9d84e0f957284985c30f806.r2.dev/legacy';
 export const assets = {
   campusVideo: 'https://www.sogang.ac.kr/banner/61_1.mp4',
   mainVisual: `${media}/v2/images/main/m_visual02.jpg`,
