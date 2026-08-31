@@ -70,6 +70,9 @@ body { @apply bg-sg-paper text-sg-ink font-sans antialiased; word-break: keep-al
 .floaty { animation: floaty 5s ease-in-out infinite; }
 @keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
 .marquee { animation: marquee 40s linear infinite; }
+/* 홈 히어로 포스터 슬라이드쇼 (JS 폴백) — 4장 × 5.5초 = 22초 주기 */
+@keyframes heroFade { 0% { opacity: 1 } 22% { opacity: 1 } 30% { opacity: 0 } 92% { opacity: 0 } 100% { opacity: 1 } }
+.hero-fade { opacity: 0; animation: heroFade 22s linear infinite; }
 
 /* 관리자 리치 에디터 */
 .ProseMirror { outline: none; }
