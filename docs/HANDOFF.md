@@ -43,4 +43,4 @@
 ## 외부에 요청해 둔 것
 - 없음
 
-> ⚠️ 커밋 author 주의: Vercel이 팀 멤버(소유자 계정) author 커밋만 빌드한다. 세션에서 커밋할 때 `git -c user.name=sgmeoffice-hub -c user.email=sgmeoffice@gmail.com commit ...`으로 author를 소유자로 지정할 것 (2026-08-31 확인).
+> ⚠️ **Vercel 프로덕션 배포 중단 — 책임자 대시보드 확인 필요 (2026-08-31 08:22Z 기준)**: main에 5개 커밋(19e418f~8ab8d82)을 푸시했고 GitHub에는 각각 "Deployment completed" 기록이 생기지만, **프로덕션은 계속 옛 빌드를 서빙** 중이다(신규 석좌교수 페이지 40분+ 미반영). 커밋 author를 소유자로 바꿔도(8ab8d82) 동일 → author 문제 아님. 컨테이너에서 확인 가능한 범위는 소진. **책임자가 vercel.com/sg-office/sogang-me → Deployments에서 최근 배포 상태(Queued/Error/Canceled?)와 팀(sg-office) Pro 트라이얼 만료·결제·빌드 한도 여부를 확인할 것.** 원인 해소 시 이미 푸시된 main이 그대로 배포되므로 재푸시 불필요. 참고: 06시 이후 커밋은 전부 문서/스크립트여서 화면으로 배포 성공을 검증한 마지막 시점은 그 이전(전공소개 개편)이다 — 중단 시점이 오늘 이전일 수 있음.
