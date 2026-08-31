@@ -61,13 +61,24 @@
 | `www/v2/` (그 외) | 약 90MB | 그누보드5 PHP 소스·스킨·플러그인·`sqlYG5`(테이블별 SQL 1,192개) |
 | `www/` (그 외) | 약 60MB | 그누보드4 소스, 이미지, `br_2014.pdf`(학과 브로슈어 32MB), 뉴스레터 등 |
 
-## 3. 이관 계획
+## 3. 이관 파이프라인 (스크립트 준비 완료)
 
-`supabase/migrate_gnuboard.md`의 매핑을 따른다. 실행 준비물:
+`supabase/migrate_gnuboard.md`의 매핑을 따르되, 실제 실행 스크립트는 다음 두 개다:
 
-1. 덤프에서 `g5_write_*`·`g5_board_file`만 파싱 → `posts` 테이블용 import SQL 생성 (`scripts/migrate_gnuboard.py` 참고, 덤프 직접 파싱으로 대체 가능)
-2. 첨부파일을 Supabase Storage `media` 버킷 `legacy/<bo_table>/` 아래 업로드 (개인정보 게시판 제외)
-3. 본문 내 `/v2/data/...` 경로를 Storage URL로 치환
-4. 영문(title_en/content_en)은 이관 후 일괄 번역 (HANDOFF의 번역 파이프라인 항목 참조)
+1. `scripts/parse_dump.py` — MySQL 덤프에서 대상 테이블만 SQLite(`legacy.db`)로 변환 (MySQL 설치 불필요)
+2. `scripts/migrate_legacy.py` — 3단계 실행:
+   - `plan`: 이관 게시글 JSONL + 파일 매니페스트 생성 (네트워크 불필요)
+   - `upload`: 첨부파일을 Storage `media` 버킷 `legacy/` 아래 업로드
+   - `insert`: posts 테이블 삽입 (`legacy_id`로 중복 방지, 재실행 안전)
+   - `upload`/`insert`에는 `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` 환경변수 필요
+
+### 검증된 이관 대상 (2026-08-31 plan 실행 결과)
+
+- 원본 분석: g4→g5 업그레이드 때 대부분 게시판은 이관됐으나 **sub6_2(장학·취업)는 미이관** → g5 전체 + "g5에 없는 g4 글"을 합쳐 이관
+- 총 **2,275건**: scholarship 1,233 / notice 668 / award 124 / events 93 / research 65 / gallery 29 / archive 29 / major 24 / alumni_news 10
+- 첨부·본문 이미지 **3,218개** (백업에 원본이 없는 파일 4개 — 무시 가능)
+- g5 공지사항 분류(ca_name) → notice/award/research 매핑, g4 공지는 제목 접두어(`[수상]` 등)로 추정
+- 본문 내 `/v2/data/`·`/data/` 경로는 Storage URL로 자동 치환. 옛 도메인 게시판 링크(`me.sogang.ac.kr/bbs/...`)가 남은 글 40건은 그대로 둠 (도메인 만료 후 죽은 링크)
+- 영문(title_en/content_en)은 이관 후 번역 파이프라인에서 일괄 처리
 
 진행 상태는 `docs/HANDOFF.md`에 기록한다.
