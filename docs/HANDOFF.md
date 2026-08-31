@@ -42,3 +42,5 @@
 
 ## 외부에 요청해 둔 것
 - 없음
+
+> ⚠️ 커밋 author 주의: Vercel이 팀 멤버(소유자 계정) author 커밋만 빌드한다. 세션에서 커밋할 때 `git -c user.name=sgmeoffice-hub -c user.email=sgmeoffice@gmail.com commit ...`으로 author를 소유자로 지정할 것 (2026-08-31 확인).
