@@ -37,14 +37,18 @@ export default async function Home({ params }: { params: { locale: Locale } }) {
         <section className="container-site -mt-14 relative z-10">
           <div className="grid gap-4 md:grid-cols-2">
             {promo.map((p: any, i: number) => { const file = (p.attachments || [])[0]; return (
-              <Reveal key={p.id} delay={i * 80}>
-                <div className="card flex overflow-hidden bg-white border-t-4 border-t-sg-cardinal shadow-[0_18px_40px_-16px_rgba(26,26,26,.28)]">
-                  <Link href={`/${l}/board/promo/${p.id}`} className="w-[38%] shrink-0 bg-sg-mist overflow-hidden"><img src={p.thumbnail_url} alt="" className="w-full h-full object-cover" /></Link>
-                  <div className="p-5 md:p-6 flex flex-col">
+              <Reveal key={p.id} delay={i * 80} className="h-full">
+                <div className="card h-full flex overflow-hidden bg-white border-t-4 border-t-sg-cardinal shadow-[0_18px_40px_-16px_rgba(26,26,26,.28)]">
+                  {/* 표지는 비율이 제각각인 PDF 커버라 자르지 않고(contain) 통째로 보여주고, 빈 공간은 표지를 흐린 배경으로 채운다 */}
+                  <Link href={`/${l}/board/promo/${p.id}`} className="relative w-[34%] md:w-[36%] shrink-0 self-stretch overflow-hidden grid place-items-center p-2 md:p-3" style={{ backgroundColor: 'rgba(26,26,26,.9)' }}>
+                    <img src={p.thumbnail_url} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover blur-lg scale-125 opacity-50" />
+                    <img src={p.thumbnail_url} alt="" className="relative max-w-full max-h-[240px] md:max-h-[280px] object-contain shadow-[0_10px_28px_rgba(0,0,0,.45)]" />
+                  </Link>
+                  <div className="p-4 md:p-6 flex flex-col min-w-0">
                     <p className="eyebrow">{ko ? '전공 홍보자료' : 'Intro materials'}</p>
-                    <h3 className="mt-1 text-[17px] md:text-[19px] font-bold leading-snug"><Link href={`/${l}/board/promo/${p.id}`} className="hover:text-sg-cardinal">{t(p, 'title', l)}</Link></h3>
-                    <p className="mt-2 text-[13.5px] text-sg-gray11 leading-relaxed line-clamp-2">{t(p, 'excerpt', l)}</p>
-                    <div className="mt-auto pt-4 flex gap-2">
+                    <h3 className="mt-1 text-[16px] md:text-[19px] font-bold leading-snug break-keep"><Link href={`/${l}/board/promo/${p.id}`} className="hover:text-sg-cardinal">{t(p, 'title', l)}</Link></h3>
+                    <p className="mt-2 text-[13px] md:text-[13.5px] text-sg-gray11 leading-relaxed line-clamp-3 break-keep">{t(p, 'excerpt', l)}</p>
+                    <div className="mt-auto pt-4 flex flex-wrap gap-2">
                       <Link href={`/${l}/board/promo/${p.id}`} className="btn-ghost !py-1.5 !px-3 !text-[13px]">{ko ? '자료 보기' : 'View'}</Link>
                       {file && <a href={file.url} download className="btn-primary !py-1.5 !px-3 !text-[13px]">PDF ↓</a>}
                     </div>
