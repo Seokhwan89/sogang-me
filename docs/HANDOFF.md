@@ -15,7 +15,10 @@
 - 전체 콘텐츠 파일에서 Physical AI 편중 점검 완료: `pages-grad.ts`, `pages-ug.ts`, `areas.ts`, `i18n.ts`는 이미 균형 잡혀 있어 미수정
 
 ## 진행 중 — 다음 세션이 이어서 할 것
-- **Supabase Storage → Cloudflare R2 무료 이전 (책임자 승인됨, 2026-08-31)**: 책임자가 Cloudflare 가입·R2 버킷 생성·API 토큰 발급을 마치면(지침 전달됨) `legacy/` 1.27GB를 R2로 복사 → DB URL 일괄 치환(posts content/thumbnail/attachments, faculty.photo_url) → 검증 후 Supabase 쪽 legacy/ 삭제해 무료 한도(1GB) 아래로 내릴 것. R2 무료 한도: 저장 10GB·egress 무제한 무료(Class A 100만/Class B 1,000만 op/월)
+- (없음 — 아래 "보류 · 대기"의 항목들만 남음)
+
+## 완료 (2026-09-01)
+- **Supabase Storage → Cloudflare R2 무료 이전 완료**: legacy 미디어 3,248개(1.28GB)를 R2 버킷 `sogang-me-media`(APAC, Cloudflare 계정=학과 Gmail)로 복사(크기 전수 검증, 오류 0) → DB URL 5,088개 치환(posts 2,073행·faculty 25행, 잔존 0 전수 확인) → `content/assets.ts`의 정적 참조 교체 → 프로덕션에서 R2 서빙 확인 → Supabase `legacy/` 삭제. **Supabase Storage 3MB로 복귀(무료 한도 해소)**. 공개 URL: `https://pub-752d1dfed9d84e0f957284985c30f806.r2.dev` (r2.dev 개발용 URL — 학교 도메인 연결 시 커스텀 도메인 권장). 신규 업로드(/adm)는 계속 Supabase로 가므로 양쪽 다 무료 한도 내 유지됨. R2 무료 한도: 저장 10GB·egress 무료. 이전용 API 토큰(sogang-me-migration)은 **폐기 권장**(책임자에게 안내됨). 초과 과금 방지용 Cloudflare Notifications 설정도 안내됨
 
 ## 완료 (2026-08-31 밤 추가)
 - **디자인 개편 브랜치 main 병합·배포** (책임자 미리보기 승인): 홈 히어로 **14영상** 순환(분야 교차 라운드로빈+CSS 폴백)·콘셉트 이미지 전면 교체·페이지 히어로 SVG 애니메이션·글라스 헤더·산학 트랙 기업 로고 배너·홈 캐러셀 20건+전체보기 카드. 최종 라인업은 `content/assets.ts` 주석 참조 — 설계·역학 5개(전투기/러닝 생체역학/반도체 조립라인/ISS/우주왕복선 발사), 열·유체 3, 제어·로보틱스 3, 생산·제조 3(**학과 제공 로봇핸드 연구영상**(구글드라이브 원본 1:31~1:37)/바이오 셀/스포츠카). 미디어는 Mixkit 무료 라이선스 추출 + 학과 제공 영상, public/media 자체 호스팅
@@ -34,7 +37,7 @@
 - **석좌교수 섹션 신설(코드)**: nav 교수진 하위에 `석좌교수`(`/faculty/chair`) 추가, `getChair()`(faculty.field='chair') + 전용 페이지, 상세페이지 탭 인식, `getFaculty(false)`는 chair 제외. `/adm` 교수 편집 폼의 "연구 분야"에 `석좌교수 (별도 목록)` 옵션 추가. 조성환 사진은 Storage `legacy/v2/data/file/sub2_3/`에 업로드 완료. (DB row는 위 "진행 중" 참조)
 
 ## 보류 · 대기
-- **Supabase Storage 용량 초과(1.27GB/1GB)** → 방침 변경(2026-08-31): 유료 전환 대신 **Cloudflare R2 무료 이전**으로 결정. 위 "진행 중" 항목 참조. 이전 완료 전까지는 소프트 리밋 상태(당장은 정상 동작, Supabase 경고 메일 수 주 방치 시 읽기 전용 제한 가능)
+- ~~Supabase Storage 용량 초과~~ → **R2 이전으로 해소됨(2026-09-01, 위 완료 항목 참조)**. Supabase Pro 전환 불필요해짐
 - 이관 완료에 따라 `SUPABASE_SERVICE_ROLE_KEY` 재발급 권장 (LEGACY-BACKUP.md 계획대로). 재발급 시 Claude 클라우드 환경설정의 값도 갱신할 것
 - **정기 DB 백업 루틴 만들기** (담당자 관심 사항, 2026-08-31): 코드·정적콘텐츠는 GitHub, 원본 legacy 백업은 구글드라이브에 있으나 Supabase DB(게시글·교수진 등)와 Storage는 무료 플랜에서 자동 백업이 없음. posts/faculty 등 전 테이블을 JSON/SQL로 덤프해 리포 외부(구글드라이브)에 보관하는 스크립트+주기 실행을 마련할 것. Pro 전환 시 일일 자동 백업 7일 포함되므로 그때는 보조 수단으로만
 - 기존 국문 전용 게시글의 영문 벌크 번역 — 클라이언트 스크립트에서 Supabase anon key 접근 문제로 중단됨. 서버 사이드 스크립트 또는 `/adm` 경로로 재접근 필요. 이관되는 legacy 게시글도 동일 파이프라인 대상
