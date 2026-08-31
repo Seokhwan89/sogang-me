@@ -46,7 +46,8 @@
 - **예약 알림 수신자 변경 (책임자 요청, 2026-08-31)**: 지금은 예약 신청 시 학과 Gmail로 알림이 오는데, 최종적으로 박현주 선생님 서강대 메일로 전달(또는 직접 발송)되도록 바꿀 것. 예약 기능 전체 구현이 마무리된 뒤 진행하기로 함 — 그 시점에 책임자에게 상기시킬 것
 - 콘텐츠 채우기: 창의적종합설계 아카이브(조원·주제 xlsx 있음), 학술제 학부생 발표 게시판, 홍보자료, 커뮤니티 뉴스
 - 자동번역을 Google/MyMemory 무료 엔드포인트에서 Claude API(`ANTHROPIC_API_KEY`)로 업그레이드하는 안 — 미착수
-- **학교 도메인(me.sogang.ac.kr) 연결 — 진행 중(2026-09-01)**: Vercel 프로젝트에 도메인 등록 완료(Verification Required 상태). 정보통신원에 요청 메일 발송 예정 — 요청 레코드: CNAME `me.sogang.ac.kr` → `914a4250d048c5d9.vercel-dns-017.com.`, TXT `_vercel.sogang.ac.kr` → `vc-domain-verify=me.sogang.ac.kr,32a472e13c9f61cbf151` (⚠ TXT는 me 하위가 아니라 sogang.ac.kr 바로 아래 `_vercel` 호스트). 기존 서버 IP·임시 주소(전환기 옛 사이트 접속용)도 함께 요청함. DNS 반영되면 Vercel Domains에서 Valid 전환·인증서 자동 발급 확인 → 이후 R2 커스텀 도메인(예: media 서브도메인) 전환 검토
+- **학교 도메인(me.sogang.ac.kr) 연결 — DNS 반영 완료(2026-09-01 오전, 디지털정보처 김현일 선생님 처리)**: CNAME `me.sogang.ac.kr`→`914a4250d048c5d9.vercel-dns-017.com.`, TXT `_vercel.sogang.ac.kr`→`vc-domain-verify=...` 모두 전파 확인됨. **남은 것: Vercel Domains에서 Refresh를 눌러 소유 확인 통과 → 인증서 자동 발급** (안 누르면 ERR_CONNECTION_CLOSED 상태 지속). 이후 R2 커스텀 도메인(media 서브도메인) 전환 검토
+- **옛 사이트 접속 경로(전환기)**: 옛 서버 IP = **183.110.224.211**. `me-old.sogang.ac.kr` DNS는 이 IP로 등록됐지만 **호스팅 업체가 서버 vhost에 me-old 도메인을 매핑해줘야 동작**(디지털정보처 안내). 업체 연락 전까지는 접속 필요 시 내 컴퓨터 hosts 파일에 `183.110.224.211 me.sogang.ac.kr` 한 줄 추가로 우회 가능(확인 후 제거)
 - 전공소개 하단 15쪽 슬라이드 뷰어(Physical AI 소개자료 원본)는 유지 중. 정리 여부는 책임자 판단 대기
 
 ## 계정 인수인계 메모
