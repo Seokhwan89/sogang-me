@@ -16,9 +16,9 @@ export const assets = {
 };
 /** 홈 히어로 배경: 4개 기초 분야 × 3개 영상 (공식 순서: 설계·역학 / 열·유체 / 제어·로보틱스 / 생산·제조).
  *  배열 순서를 분야 라운드로빈으로 두어 CSS 폴백 슬라이드쇼도 분야가 번갈아 나온다.
- *  추가분 Mixkit 출처: design-2=#32652(기어), design-3=#22030(항공기 정비), thermal-2=#229(수중 입자),
- *  thermal-3=#52312(화염), control-2=#47266(회로 조립기), control-3=#20970(로봇 그리퍼),
- *  manufacturing-2=#21487(선반 가공), manufacturing-3=#45349(용접). */
+ *  추가분 Mixkit 출처: design-2=#609(러닝 슬로모션·생체역학), design-3=#22030(항공기 정비),
+ *  thermal-2=#47051(반도체 회로 매크로), thermal-3=#52312(화염), control-2=#47266(회로 조립기),
+ *  control-3=#40198(사이보그 핸드), manufacturing-2=#27295(3D프린팅), manufacturing-3=#45349(용접). */
 const hv = (name: string, field: string) => ({ field, src: `/media/hero/hero-${name}.mp4`, poster: `/media/hero/hero-${name}.jpg` });
 export const heroFieldVideos = [
   hv('design', 'design'), hv('thermal', 'thermal'), hv('control', 'control'), hv('manufacturing', 'manufacturing'),

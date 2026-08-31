@@ -15,7 +15,7 @@ export async function getHomeData() {
   const [postsByBoard, gallery, banners, settings, promo, videos] = await Promise.all([
     Promise.all(homeBoards.map((b) => safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,video_url,created_at,is_pinned')
       .eq('board', b).eq('published', true).eq('show_on_home', true)
-      .order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(20) as any, []))),
+      .order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(24) as any, []))),
     safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,thumbnail_url,images,created_at').eq('board', 'gallery').eq('published', true).order('created_at', { ascending: false }).limit(8) as any, []),
     safe<any[]>(() => sb.from('banners').select('*').eq('visible', true).order('sort_order') as any, []),
     safe<any>(() => sb.from('site_settings').select('value').eq('key', 'home').single() as any, null),

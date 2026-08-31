@@ -60,6 +60,13 @@ function Row({ locale, board, posts, variant }: { locale: Locale; board: string;
               </Link>
             );
           })}
+          {/* 캐러셀 끝: 전체 목록으로 이어지는 더보기 카드 */}
+          <Link data-card href={`/${locale}/board/${board}`} className="card group snap-start shrink-0 w-[78vw] sm:w-[calc(50%-10px)] lg:w-[calc(25%-15px)] grid place-items-center min-h-[220px] border-dashed">
+            <span className="text-center">
+              <span className="block text-3xl text-sg-gray5 group-hover:text-sg-cardinal transition-colors">→</span>
+              <span className="mt-2 block font-semibold text-[15px] text-sg-gray11 group-hover:text-sg-cardinal">{ko ? '전체 보기' : 'View all'}</span>
+            </span>
+          </Link>
         </div>
       )}
     </div>
