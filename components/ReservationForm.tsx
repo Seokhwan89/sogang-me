@@ -33,7 +33,7 @@ export default function ReservationForm({ locale, facility, date }: { locale: Lo
     if (!r.ok) { setMsg(j.error || 'error'); setState('error'); } else setState('done');
   }
 
-  if (state === 'done') return <div className="border-l-4 border-sg-cardinal bg-sg-mist p-6"><p className="font-bold text-[17px]">{ko ? '예약 신청이 접수되었습니다.' : 'Your request has been received.'}</p><p className="text-[14.5px] text-sg-gray11 mt-1">{ko ? '학과사무실 확인 후 승인되면 캘린더에 표시됩니다. (02-705-8631)' : 'It will appear on the calendar once approved by the department office. (+82-2-705-8631)'}</p></div>;
+  if (state === 'done') return <div className="border-l-4 border-sg-cardinal bg-sg-mist p-6"><p className="font-bold text-[17px]">{ko ? '예약 신청이 접수되었습니다.' : 'Your request has been received.'}</p><p className="text-[14.5px] text-sg-gray11 mt-1 break-keep">{ko ? '신청하신 시간이 캘린더에 「승인 대기」로 바로 표시되며, 학과사무실 확인 후 확정됩니다. (02-705-8631)' : 'Your slot now appears on the calendar as “pending” and will be confirmed by the department office. (+82-2-705-8631)'}</p></div>;
 
   return (
     <form onSubmit={submit} onChange={(e) => check(e.currentTarget)} className="grid gap-4 sm:grid-cols-2 border border-sg-line p-6 bg-white">

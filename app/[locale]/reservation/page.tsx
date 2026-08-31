@@ -25,7 +25,7 @@ export default async function Reservation({ params, searchParams }: { params: { 
       <div className="flex flex-wrap gap-2 mb-6">
         {facilities.map((f) => <Link key={f.id} href={`/${l}/reservation?f=${f.id}&y=${y}&m=${m}`} className={`px-4 py-2 text-[13px] border ${f.id === facility ? 'bg-sg-ink text-white border-sg-ink' : 'border-sg-line hover:border-sg-ink'}`}>{ko ? f.ko : f.en}</Link>)}
       </div>
-      <p className="text-[13px] text-sg-steel mb-6">{ko ? '* 예약은 아래 신청 양식으로 요청하시거나 학과사무실(02-705-8631)로 문의해 주세요. 승인된 예약만 캘린더에 표시됩니다.' : '* Request a reservation with the form below or contact the department office (+82-2-705-8631). Only approved reservations are shown.'}</p>
+      <p className="text-[13px] text-sg-steel mb-6 break-keep">{ko ? '* 예약은 아래 신청 양식으로 요청하시거나 학과사무실(02-705-8631)로 문의해 주세요. 신청 즉시 캘린더에 「승인 대기」로 표시되어 겹치는 시간에는 신청할 수 없으며, 학과사무실 승인 후 확정으로 바뀝니다.' : '* Request a reservation with the form below or contact the department office (+82-2-705-8631). New requests appear on the calendar immediately as “pending”, overlapping requests are blocked, and slots are confirmed once approved.'}</p>
       <div className="border border-sg-line">
         <div className="flex items-center justify-between px-4 py-3 bg-sg-ink text-white">
           <Link href={`/${l}/reservation?f=${facility}&y=${prev.y}&m=${prev.m}`} className="font-mono px-2 hover:text-sg-red" aria-label="prev">‹</Link>
@@ -41,7 +41,7 @@ export default async function Reservation({ params, searchParams }: { params: { 
               <div key={d} className={`border-b border-r border-sg-line p-1.5 ${ds === todayStr ? 'bg-sg-red/5' : ''}`}>
                 <span className={`font-mono text-[12px] ${(first + d - 1) % 7 === 0 ? 'text-sg-red' : ''}`}>{d}</span>
                 <ul className="mt-1 space-y-1">{(byDay[d] || []).map((r: any) => (
-                  <li key={r.id} className={`text-[11px] leading-tight px-1 py-0.5 border-l-2 ${r.status === 'approved' ? 'border-sg-red bg-white' : 'border-sg-steel bg-sg-mist text-sg-steel'}`} title={r.purpose || ''}>
+                  <li key={r.id} className={`text-[11px] leading-tight px-1 py-0.5 border-l-2 ${r.status === 'approved' ? 'border-sg-red bg-white' : 'border-dashed border-sg-cardinal bg-sg-mist text-sg-gray11'}`} title={r.purpose || ''}>
                     <span className="font-mono">{r.start_time.slice(0, 5)}–{r.end_time.slice(0, 5)}</span> {r.user_name}{r.status !== 'approved' && ` (${T(l, 'pending')})`}
                   </li>
                 ))}</ul>

@@ -7,12 +7,15 @@ const safe = async <T,>(fn: () => Promise<{ data: T | null; error: any }>, fallb
   catch (e: any) { console.error(e?.message); return fallback; }
 };
 
+const homeBoards = ['notice', 'research', 'award', 'alumni_news'] as const;
+
 export async function getHomeData() {
   const sb = createPublicClient();
-  const [posts, gallery, banners, settings, promo, videos] = await Promise.all([
-    safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,video_url,created_at,is_pinned')
-      .in('board', ['notice', 'research', 'award', 'alumni_news']).eq('published', true).eq('show_on_home', true)
-      .order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(120) as any, []),
+  // 게시판별로 따로 조회한다 — 합쳐서 최신순으로 자르면 글이 많은 게시판(공지)이 다른 줄(동문 소식)을 밀어낸다
+  const [postsByBoard, gallery, banners, settings, promo, videos] = await Promise.all([
+    Promise.all(homeBoards.map((b) => safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,video_url,created_at,is_pinned')
+      .eq('board', b).eq('published', true).eq('show_on_home', true)
+      .order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(20) as any, []))),
     safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,thumbnail_url,images,created_at').eq('board', 'gallery').eq('published', true).order('created_at', { ascending: false }).limit(8) as any, []),
     safe<any[]>(() => sb.from('banners').select('*').eq('visible', true).order('sort_order') as any, []),
     safe<any>(() => sb.from('site_settings').select('value').eq('key', 'home').single() as any, null),
@@ -20,8 +23,7 @@ export async function getHomeData() {
     safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,video_url,category,category_en,sort_order,created_at').eq('board', 'videos').eq('published', true).order('sort_order').limit(4) as any, []),
   ]);
   const n = settings?.value?.news_count ?? 8;
-  const groups: Record<string, Post[]> = { notice: [], research: [], award: [], alumni_news: [] };
-  for (const p of posts) if (groups[p.board] && groups[p.board].length < n) groups[p.board].push(p);
+  const groups: Record<string, Post[]> = Object.fromEntries(homeBoards.map((b, i) => [b, (postsByBoard[i] || []).slice(0, n)]));
   return { groups, gallery, banners, settings: settings?.value ?? {}, promo, videos };
 }
 
