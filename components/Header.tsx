@@ -32,7 +32,7 @@ export default function Header({ locale }: { locale: Locale }) {
   useEffect(() => { setOpen(false); setMega(false); }, [pathname]);
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 bg-white transition-shadow ${scrolled || mega ? 'shadow-[0_2px_20px_rgba(0,0,0,.08)]' : ''}`} onMouseLeave={() => setMega(false)}>
+    <header className={`fixed inset-x-0 top-0 z-50 backdrop-blur-xl transition-[background-color,box-shadow] duration-300 ${scrolled || mega || open ? 'bg-white/90 shadow-[0_2px_20px_rgba(0,0,0,.08)]' : 'bg-white/85 supports-[backdrop-filter]:bg-white/60'}`} onMouseLeave={() => setMega(false)}>
       <div className="h-1 bg-sg-cardinal" />
       <div className="container-site h-[76px] flex items-center justify-between gap-6">
         <Logo locale={locale} />
@@ -53,7 +53,7 @@ export default function Header({ locale }: { locale: Locale }) {
         </div>
       </div>
       {/* Mega menu (desktop) — all sub-menus at once, like the university site */}
-      <div className={`hidden lg:block absolute inset-x-0 top-full bg-white border-t border-sg-line overflow-hidden transition-[max-height,opacity] duration-300 ${mega ? 'max-h-[420px] opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div className={`hidden lg:block absolute inset-x-0 top-full bg-white/95 backdrop-blur-xl border-t border-sg-line overflow-hidden transition-[max-height,opacity] duration-300 ${mega ? 'max-h-[420px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <div className="container-site grid grid-cols-7 gap-4 py-7">
           {nav.map((item) => (
             <div key={item.id}>
@@ -64,7 +64,7 @@ export default function Header({ locale }: { locale: Locale }) {
         </div>
       </div>
       {open && (
-        <div className="lg:hidden bg-white border-t border-sg-line max-h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="lg:hidden bg-white/95 backdrop-blur-xl border-t border-sg-line max-h-[calc(100vh-80px)] overflow-y-auto">
           {nav.map((item) => (
             <div key={item.id} className="border-b border-sg-line">
               <button className="w-full flex items-center justify-between px-5 py-4 text-left text-[16px] font-semibold" onClick={() => setMobile(mobile === item.id ? null : item.id)} aria-expanded={mobile === item.id}>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { nav, label } from '@/lib/nav';
 import { T, type Locale } from '@/lib/i18n';
 import { sectionHero } from '@/content/assets';
+import HeroDecor from './HeroDecor';
 
 export default function PageHero({ locale, section, current, title, image }: { locale: Locale; section: string; current?: string; title?: string; image?: string }) {
   const sec = nav.find((n) => n.id === section);
@@ -11,7 +12,7 @@ export default function PageHero({ locale, section, current, title, image }: { l
   return (
     <>
       <section className="relative bg-sg-ink text-white pt-[80px] overflow-hidden">
-        <div className="absolute inset-0"><img src={img} alt="" className="w-full h-full object-cover kenburns" /><div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(26,26,26,.85),rgba(139,30,36,.55)_60%,rgba(26,26,26,.3))]" /></div>
+        <div className="absolute inset-0"><img src={img} alt="" className="w-full h-full object-cover kenburns" /><div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(26,26,26,.85),rgba(139,30,36,.55)_60%,rgba(26,26,26,.3))]" /><HeroDecor /></div>
         <div className="container-site relative py-20 md:py-24">
           <p className="text-[14px] font-semibold tracking-[0.12em] text-white/75 uppercase">{sec ? label(sec, locale) : 'Sogang ME'}</p>
           <h1 className="h-display mt-3">{heading}</h1>

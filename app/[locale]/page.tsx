@@ -6,7 +6,7 @@ import { emblemOf } from '@/components/FieldEmblems';
 import { getHomeData, getLabCount } from '@/lib/data';
 import { T, t, type Locale } from '@/lib/i18n';
 import { areas } from '@/content/areas';
-import { assets } from '@/content/assets';
+import { assets, heroFieldVideos } from '@/content/assets';
 import { youtubeThumb } from '@/lib/html';
 
 export const revalidate = 60;
@@ -31,7 +31,7 @@ export default async function Home({ params }: { params: { locale: Locale } }) {
 
   return (
     <>
-      {on('hero') && <HeroVideo locale={l} videoUrl={settings.hero_video_url ?? assets.campusVideo} poster={settings.hero_poster_url ?? assets.mainVisual} taglineKo={settings.tagline_ko} taglineEn={settings.tagline_en} />}
+      {on('hero') && <HeroVideo locale={l} videoUrl={settings.hero_video_url ?? undefined} fieldVideos={heroFieldVideos} poster={settings.hero_poster_url ?? assets.mainVisual} taglineKo={settings.tagline_ko} taglineEn={settings.tagline_en} />}
 
       {on('promo') && promo.length > 0 && (
         <section className="container-site -mt-14 relative z-10">

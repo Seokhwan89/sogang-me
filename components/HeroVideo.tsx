@@ -2,20 +2,23 @@ import Link from 'next/link';
 import { T, type Locale } from '@/lib/i18n';
 import { DesignEmblem, ThermalEmblem, ControlEmblem, ManufacturingEmblem } from './FieldEmblems';
 import { areas } from '@/content/areas';
+import HeroRotator from './HeroRotator';
 
 const Em = [DesignEmblem, ThermalEmblem, ControlEmblem, ManufacturingEmblem];
 
-export default function HeroVideo({ locale, videoUrl, poster, taglineKo, taglineEn }: { locale: Locale; videoUrl?: string; poster?: string; taglineKo?: string | null; taglineEn?: string | null }) {
+export default function HeroVideo({ locale, videoUrl, poster, taglineKo, taglineEn, fieldVideos }: { locale: Locale; videoUrl?: string; poster?: string; taglineKo?: string | null; taglineEn?: string | null; fieldVideos?: { src: string; poster: string }[] }) {
   const ko = locale === 'ko';
   const tagline = ko ? taglineKo : taglineEn;
   return (
     <section className="relative min-h-[100svh] bg-sg-ink text-white overflow-hidden pt-[80px]">
-      {/* Background: campus video (falls back to the department's main visual) */}
+      {/* Background: 관리자가 지정한 영상 > 4개 분야 영상 순환 > 정적 이미지 순 */}
       <div className="absolute inset-0">
         {videoUrl ? (
           <video className="w-full h-full object-cover" autoPlay muted loop playsInline poster={poster} preload="metadata">
             <source src={videoUrl} type="video/mp4" />
           </video>
+        ) : fieldVideos?.length ? (
+          <HeroRotator videos={fieldVideos} />
         ) : (
           <img src={poster} alt="" className="w-full h-full object-cover kenburns" />
         )}
