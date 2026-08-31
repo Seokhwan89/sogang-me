@@ -15,7 +15,7 @@ export default async function FacultyDetail({ params }: { params: { locale: Loca
   const area = areas.find((a) => a.id === f.field);
   const research = toHtml(t(f, 'research', l)); const bio = toHtml(t(f, 'bio', l));
   return (<>
-    <PageHero locale={l} section="faculty" current={f.is_emeritus ? 'emeritus' : 'professors'} title={`${t(f, 'name', l)} ${t(f, 'title', l)}`} />
+    <PageHero locale={l} section="faculty" current={f.is_emeritus ? 'emeritus' : f.field === 'chair' ? 'chair' : 'professors'} title={`${t(f, 'name', l)} ${t(f, 'title', l)}`} />
     <div className="container-site py-14 grid lg:grid-cols-[300px_1fr] gap-12 items-start">
       <aside>
         <div className="aspect-[3/4] max-w-[280px] bg-sg-mist overflow-hidden border border-sg-line">{f.photo_url ? <img src={f.photo_url} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full grid place-items-center font-brand text-6xl text-sg-gray5">{(f.name_ko||"").slice(0,1)}</div>}</div>
