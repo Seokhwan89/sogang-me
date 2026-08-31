@@ -1,7 +1,7 @@
 /** Media reused from the existing department site / Sogang UI assets. Replace with department-owned uploads later (관리자 > 메인·설정).
  *  구 도메인(me.sogang.ac.kr) 만료에 대비해 원본을 Storage `legacy/`로 옮겨 참조한다 (2026-08-31).
  *  /media/ 아래 파일은 Mixkit 무료 라이선스(상업 이용·수정 가능, 출처표기 불요) 영상에서 추출·인코딩한 것:
- *  hero-design=mixkit #46951(전투기 비행), hero-thermal=#154(잉크 유동), hero-control=#47257(산업 로봇),
+ *  hero-design=mixkit #46952(전투기 저공비행), hero-thermal=#154(잉크 유동), hero-control=#47257(산업 로봇),
  *  page-entrance=#5900(캠퍼스), page-research=#17456(실험 튜브),
  *  page-festival=#48166(강의실 팀활동), page-industry=#47257, page-ureca=#23618(연구실 현미경). */
 const media = 'https://pvdobbplxndsigatnamu.supabase.co/storage/v1/object/public/media/legacy';
@@ -16,7 +16,7 @@ export const assets = {
 };
 /** 홈 히어로 배경: 4개 기초 분야 × 3개 영상 (공식 순서: 설계·역학 / 열·유체 / 제어·로보틱스 / 생산·제조).
  *  배열 순서를 분야 라운드로빈으로 두어 CSS 폴백 슬라이드쇼도 분야가 번갈아 나온다.
- *  추가분 Mixkit 출처: design-2=#5852(생체역학 분석 랩), design-3=#46963(반도체 조립라인 기계 내부),
+ *  추가분 Mixkit 출처: design-2=#609(러닝 슬로모션·생체역학), design-3=#46963(반도체 조립라인 기계 내부),
  *  thermal-2=#47051(반도체 회로 매크로), thermal-3=#17456(실험 튜브 유체 매크로), control-2=#47266(회로 조립기),
  *  control-3=#31933(드론 호버링 슬로모션), manufacturing=#20970(정밀 로봇 그리퍼), manufacturing-2=#3968(바이오 셀 매크로), manufacturing-3=#23230(연구용 델타 3D프린터). */
 const hv = (name: string, field: string) => ({ field, src: `/media/hero/hero-${name}.mp4`, poster: `/media/hero/hero-${name}.jpg` });
