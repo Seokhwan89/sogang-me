@@ -18,7 +18,7 @@ export const assets = {
  *  배열 순서를 분야 라운드로빈으로 두어 CSS 폴백 슬라이드쇼도 분야가 번갈아 나온다.
  *  추가분 Mixkit 출처: design-2=#5852(생체역학 분석 랩), design-3=#46963(반도체 조립라인 기계 내부),
  *  thermal-2=#47051(반도체 회로 매크로), thermal-3=#17456(실험 튜브 유체 매크로), control-2=#47266(회로 조립기),
- *  control-3=#20961(휴머노이드 로봇 페이스), manufacturing=#20970(정밀 로봇 그리퍼), manufacturing-2=#3968(바이오 셀 매크로), manufacturing-3=#23230(연구용 델타 3D프린터). */
+ *  control-3=#31933(드론 호버링 슬로모션), manufacturing=#20970(정밀 로봇 그리퍼), manufacturing-2=#3968(바이오 셀 매크로), manufacturing-3=#23230(연구용 델타 3D프린터). */
 const hv = (name: string, field: string) => ({ field, src: `/media/hero/hero-${name}.mp4`, poster: `/media/hero/hero-${name}.jpg` });
 export const heroFieldVideos = [
   hv('design', 'design'), hv('thermal', 'thermal'), hv('control', 'control'), hv('manufacturing', 'manufacturing'),
