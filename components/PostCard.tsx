@@ -10,7 +10,7 @@ export type Post = {
   video_url?: string | null; term?: string | null; members?: string | null; advisor?: string | null; category?: string | null; category_en?: string | null; sort_order?: number | null;
 };
 
-export const fmtDate = (d: string) => new Date(d).toISOString().slice(0, 10).replace(/-/g, '.');
+export const fmtDate = (d: string) => new Date(d).toISOString().slice(0, 10).replace(/-/g, '.'); // 주의: legacy 글은 KST 시각이 +00으로 저장돼 있어 UTC 날짜가 원본 날짜다 (+9h 보정 금지)
 
 export default function PostCard({ post, locale }: { post: Post; locale: Locale }) {
   const tag = T(locale, post.board as any) || post.board;

@@ -9,8 +9,8 @@ export const revalidate = 30;
 export default async function Reservation({ params, searchParams }: { params: { locale: Locale }; searchParams: { f?: string; y?: string; m?: string } }) {
   const l = params.locale; const ko = l === 'ko';
   const facility = facilities.some((x) => x.id === searchParams.f) ? searchParams.f! : 'seminar';
-  const now = new Date();
-  const y = Number(searchParams.y || now.getFullYear()); const m = Number(searchParams.m || now.getMonth() + 1);
+  const now = new Date(Date.now() + 9 * 3600 * 1000); // KST 기준 (서버는 UTC)
+  const y = Number(searchParams.y || now.getUTCFullYear()); const m = Number(searchParams.m || now.getUTCMonth() + 1);
   const rows = await getReservations(facility, y, m);
   const first = new Date(y, m - 1, 1).getDay(); const days = new Date(y, m, 0).getDate();
   const prev = m === 1 ? { y: y - 1, m: 12 } : { y, m: m - 1 }; const next = m === 12 ? { y: y + 1, m: 1 } : { y, m: m + 1 };

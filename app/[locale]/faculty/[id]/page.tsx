@@ -34,7 +34,7 @@ export default async function FacultyDetail({ params }: { params: { locale: Loca
         {research ? <><h2 className="!mt-0">{T(l, 'field')}</h2><div dangerouslySetInnerHTML={{ __html: research }} /></> : null}
         {bio ? <><h2>{ko ? '약력' : 'Biography'}</h2><div dangerouslySetInnerHTML={{ __html: bio }} /></> : null}
         {!research && !bio && <p className="text-sg-steel">{ko ? '상세 정보는 연구실 홈페이지를 참고해 주세요.' : 'See the laboratory website for details.'}</p>}
-        <p className="mt-10"><Link href={`/${l}/faculty`} className="btn-ghost !no-underline">← {T(l, 'list')}</Link></p>
+        <p className="mt-10"><Link href={`/${l}/faculty${f.is_emeritus ? '/emeritus' : f.field === 'chair' ? '/chair' : ''}`} className="btn-ghost !no-underline">← {T(l, 'list')}</Link></p>
       </div>
     </div>
   </>);
