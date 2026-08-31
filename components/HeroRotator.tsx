@@ -38,10 +38,8 @@ export default function HeroRotator({ videos }: { videos: { src: string; poster:
       {/* 영상 로드 전·모션 축소 환경: 첫 포스터 */}
       <img src={videos[0]?.poster} alt="" className="absolute inset-0 w-full h-full object-cover" />
       {order && videos.map((v, i) => (
-        <video key={v.src} ref={(el) => { refs.current[i] = el; }} muted playsInline loop preload={i === order[0] ? 'auto' : 'metadata'} poster={v.poster}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${i === active ? 'opacity-100' : 'opacity-0'}`}>
-          <source src={v.src} type="video/mp4" />
-        </video>
+        <video key={v.src} ref={(el) => { refs.current[i] = el; }} src={v.src} autoPlay muted playsInline loop preload={i === order[0] ? 'auto' : 'metadata'} poster={v.poster}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${i === active ? 'opacity-100' : 'opacity-0'}`} />
       ))}
     </div>
   );
