@@ -39,7 +39,8 @@
 ## 보류 · 대기
 - ~~Supabase Storage 용량 초과~~ → **R2 이전으로 해소됨(2026-09-01, 위 완료 항목 참조)**. Supabase Pro 전환 불필요해짐
 - 이관 완료에 따라 `SUPABASE_SERVICE_ROLE_KEY` 재발급 권장 (LEGACY-BACKUP.md 계획대로). 재발급 시 Claude 클라우드 환경설정의 값도 갱신할 것
-- **정기 DB 백업 루틴 만들기** (담당자 관심 사항, 2026-08-31): 코드·정적콘텐츠는 GitHub, 원본 legacy 백업은 구글드라이브에 있으나 Supabase DB(게시글·교수진 등)와 Storage는 무료 플랜에서 자동 백업이 없음. posts/faculty 등 전 테이블을 JSON/SQL로 덤프해 리포 외부(구글드라이브)에 보관하는 스크립트+주기 실행을 마련할 것. Pro 전환 시 일일 자동 백업 7일 포함되므로 그때는 보조 수단으로만
+- **정기 DB 백업 루틴** (2026-09-01 구축): `scripts/gas-db-backup.gs`를 학과 Gmail의 Google Apps Script(script.google.com)에 설치 — 매주 월 04시(KST) posts·faculty·reservations 등 6개 테이블을 JSON.gz로 덤프해 학과 드라이브 백업 폴더(`db-backup_YYYY-MM-DD/`)에 저장, 26세트 초과분 자동 정리, 실패 시 학과 Gmail로 알림 메일. service_role 키는 Apps Script "스크립트 속성"에만 보관(리포 금지). **책임자 설치 완료 여부는 드라이브에 db-backup_ 폴더가 생겼는지로 확인할 것.** 전체 백업 체계: 코드=GitHub / legacy 미디어=R2+드라이브 원본 / DB=주간 드라이브 덤프
+- **R2 미디어 1회 스냅샷 (권장, 미실행)**: legacy 파일은 불변이라 정기 백업 불필요하지만, Cloudflare 계정 사고(실수 삭제·해킹·정지) 대비 1:1 사본 1회 권장. `scripts/r2-archive-colab.py`를 Colab에서 실행하면 드라이브에 `sogang-me-r2-backup_날짜.tar`(1.3GB) 생성. 파일 목록은 `scripts/r2-inventory.json`(3,253개, 크기 검증용)
 - 기존 국문 전용 게시글의 영문 벌크 번역 — 클라이언트 스크립트에서 Supabase anon key 접근 문제로 중단됨. 서버 사이드 스크립트 또는 `/adm` 경로로 재접근 필요. 이관되는 legacy 게시글도 동일 파이프라인 대상
 - **저장 구조 판단 기준(2026-09-01 합의)**: 현 구조(Supabase=DB·신규 업로드 / R2=legacy 파일 / Vercel=호스팅) 유지. Cloudflare로 전부 통합(D1 등)은 백엔드 재작성 대비 이득이 없어 하지 않기로 함. 단, Supabase Storage가 다시 1GB에 근접하면 그때 신규 업로드 경로를 R2로 전환 검토
 - **예약 알림 수신자 변경 (책임자 요청, 2026-08-31)**: 지금은 예약 신청 시 학과 Gmail로 알림이 오는데, 최종적으로 박현주 선생님 서강대 메일로 전달(또는 직접 발송)되도록 바꿀 것. 예약 기능 전체 구현이 마무리된 뒤 진행하기로 함 — 그 시점에 책임자에게 상기시킬 것
