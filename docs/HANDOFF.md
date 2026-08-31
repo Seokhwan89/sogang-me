@@ -11,7 +11,7 @@
 - 전체 콘텐츠 파일에서 Physical AI 편중 점검 완료: `pages-grad.ts`, `pages-ug.ts`, `areas.ts`, `i18n.ts`는 이미 균형 잡혀 있어 미수정
 
 ## 보류 · 대기
-- **기존 홈페이지 → 새 사이트 전체 콘텐츠 이관** (책임자 지시): `docs/LEGACY-BACKUP.md`의 이관 계획대로 g5 게시글 → Supabase posts, 첨부파일 → Storage `media/legacy/`. 실행에는 Supabase service_role key(또는 `/adm` 경유)가 필요 — 컨테이너에 키가 없어 SQL/업로드 실행 단계에서 대기
+- **기존 홈페이지 → 새 사이트 전체 콘텐츠 이관** (책임자 지시): `docs/LEGACY-BACKUP.md`의 이관 파이프라인 실행만 남음. Claude 클라우드 환경설정에 `SUPABASE_URL`·`SUPABASE_SERVICE_ROLE_KEY`(sb_secret 신형 키)가 저장되어 있어 새 세션은 바로 사용 가능. 순서: 드라이브에서 백업 2개 다운로드(gdown, 책임자에게 공유 링크 요청) → `scripts/parse_dump.py` → `scripts/migrate_legacy.py` plan/upload/insert → 게시판 화면 확인. Storage `media` 버킷이 없으면 먼저 생성(public). 완료 후 키 재발급 권장
 - 기존 국문 전용 게시글의 영문 벌크 번역 — 클라이언트 스크립트에서 Supabase anon key 접근 문제로 중단됨. 서버 사이드 스크립트 또는 `/adm` 경로로 재접근 필요. 이관되는 legacy 게시글도 동일 파이프라인 대상
 - 콘텐츠 채우기: 창의적종합설계 아카이브(조원·주제 xlsx 있음), 학술제 학부생 발표 게시판, 홍보자료, 커뮤니티 뉴스
 - 자동번역을 Google/MyMemory 무료 엔드포인트에서 Claude API(`ANTHROPIC_API_KEY`)로 업그레이드하는 안 — 미착수
