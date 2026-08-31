@@ -47,6 +47,10 @@
 - 학교 도메인(예: me.sogang.ac.kr) 연결 — 미신청. 신청 시 CNAME + `_vercel` TXT를 함께 요청하고 전파 6~8시간 감안
 - 전공소개 하단 15쪽 슬라이드 뷰어(Physical AI 소개자료 원본)는 유지 중. 정리 여부는 책임자 판단 대기
 
+## 계정 인수인계 메모
+- **Cloudflare(R2 미디어 호스팅)**: https://dash.cloudflare.com — 아이디는 학과 Gmail(sgmeoffice@gmail.com). **비밀번호는 이 문서에 적지 않는다(공개 리포). 학과 인수인계 문서(구글드라이브, 백업 보관 위치와 동일)에 보관할 것.** Vercel·Supabase·GitHub도 같은 학과 Gmail 계정 기준
+- 이 리포는 **public**이므로 어떤 비밀번호·API 키·토큰도 커밋 금지. 기록이 필요하면 구글드라이브 인수인계 문서에
+
 ## 확인된 환경 특성
 - Tailwind 커스텀 색상 + 투명도 수식 미동작 → 인라인 rgba 사용 (CLAUDE.md 참조)
 - Vercel 배포 지연 약 80~120초
