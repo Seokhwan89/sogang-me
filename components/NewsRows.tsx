@@ -115,7 +115,7 @@ export default function NewsRows({ locale, groups }: { locale: Locale; groups: R
     <div>
       {/* 공지: 카드 대신 두 칼럼 제목 리스트 — 일반공지(왼쪽) / 학사공지(오른쪽) */}
       <div className="pb-10 border-b border-sg-line">
-        <div className="grid gap-5 lg:grid-cols-2 items-stretch">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 items-stretch">
           <NoticeList locale={locale} board="notice" posts={groups.notice || []} />
           <NoticeList locale={locale} board="academic" posts={groups.academic || []} />
         </div>
