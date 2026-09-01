@@ -23,7 +23,7 @@ export default async function Settings() {
         <label className="block text-[13px]">히어로 문구 (한국어)<input name="tagline_ko" defaultValue={v.tagline_ko || ''} className="input mt-1" placeholder="비우면 기본 문구" /></label>
         <label className="block text-[13px]">Hero tagline (English)<input name="tagline_en" defaultValue={v.tagline_en || ''} className="input mt-1" /></label>
       </div>
-      <label className="block text-[13px]">신청 알림 받을 이메일 (시설 예약·URECA 지원 시 메일 발송)<input name="notify_email" type="email" defaultValue={v.notify_email || ''} className="input mt-1" placeholder="sgmeoffice@gmail.com" /><span className="block mt-1 text-[12px] text-sg-steel">메일 발송에는 Vercel 환경변수 RESEND_API_KEY 설정이 필요합니다 (resend.com 무료 계정, 월 3,000통). 키가 없으면 신청은 정상 접수되고 메일만 생략됩니다.</span></label>
+      <label className="block text-[13px]">신청 알림 받을 이메일 (시설 예약·URECA 지원 시 메일 발송 — 쉼표로 여러 명 지정 가능)<input name="notify_email" type="text" defaultValue={v.notify_email || ''} className="input mt-1" placeholder="sgmeoffice@gmail.com, 행정실@sogang.ac.kr" /><span className="block mt-1 text-[12px] text-sg-steel">메일 발송에는 Vercel 환경변수 RESEND_API_KEY 설정이 필요합니다 (resend.com 무료 계정, 월 3,000통). 키가 없으면 신청은 정상 접수되고 메일만 생략됩니다.</span></label>
       <p className="text-[12px] text-sg-steel">메인 노출 여부는 각 게시글 편집 화면의 "메인 페이지에 노출" 체크로 개별 제어됩니다.</p>
       <button className="btn-primary">저장</button>
     </form>

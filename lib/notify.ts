@@ -9,12 +9,14 @@ export async function notifyAdmin(subject: string, html: string) {
   if (!key) return { skipped: true };
   const sb = createPublicClient();
   const { data } = await sb.from('site_settings').select('value').eq('key', 'home').maybeSingle();
-  const to = data?.value?.notify_email || process.env.NOTIFY_EMAIL;
-  if (!to) return { skipped: true };
+  const raw = data?.value?.notify_email || process.env.NOTIFY_EMAIL;
+  // 쉼표로 여러 수신자 지정 가능 (예: "sgmeoffice@gmail.com, hjpark@sogang.ac.kr")
+  const to = String(raw || '').split(',').map((s: string) => s.trim()).filter(Boolean);
+  if (!to.length) return { skipped: true };
   try {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST', headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: process.env.NOTIFY_FROM || 'Sogang ME <onboarding@resend.dev>', to: [to], subject, html }),
+      body: JSON.stringify({ from: process.env.NOTIFY_FROM || 'Sogang ME <onboarding@resend.dev>', to, subject, html }),
     });
     return { ok: r.ok };
   } catch (e: any) { console.error('notify failed', e?.message); return { ok: false }; }
