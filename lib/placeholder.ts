@@ -1,6 +1,6 @@
 /** Auto-generated cover image (SVG data URI) for posts without a photo — category-tinted, with the title's leading words. */
 const palettes: Record<string, [string, string]> = {
-  notice: ['#53565a', '#1a1a1a'], research: ['#af272f', '#5c1116'], award: ['#d86018', '#8a3a0c'],
+  notice: ['#53565a', '#1a1a1a'], academic: ['#0b4f6c', '#062a3a'], research: ['#af272f', '#5c1116'], award: ['#d86018', '#8a3a0c'],
   scholarship: ['#00558c', '#002e4d'], gallery: ['#719949', '#3b5527'], default: ['#75787b', '#3a3c3e'],
 };
 export function coverFor(board: string, title: string, seed = 0) {

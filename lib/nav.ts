@@ -39,7 +39,8 @@ export const nav: NavItem[] = [
     { id: 'mobis', ko: '현대모비스 모빌리티 SW 채용연계 트랙', en: 'Hyundai Mobis Mobility SW Track', href: '/industry/mobis' },
   ]},
   { id: 'board', ko: '학과게시판', en: 'Board', href: '/board/notice', sub: [
-    { id: 'notice', ko: '공지사항', en: 'Notice', href: '/board/notice' },
+    { id: 'notice', ko: '일반공지', en: 'General Notice', href: '/board/notice' },
+    { id: 'academic', ko: '학사공지', en: 'Academic Notice', href: '/board/academic' },
     { id: 'research', ko: '연구성과', en: 'Research', href: '/board/research' },
     { id: 'award', ko: '수상', en: 'Awards', href: '/board/award' },
     { id: 'scholarship', ko: '장학·취업정보', en: 'Scholarship & Careers', href: '/board/scholarship' },
@@ -55,7 +56,7 @@ export const nav: NavItem[] = [
   ]},
 ];
 export const label = (item: { ko: string; en: string }, l: Locale) => (l === 'en' ? item.en : item.ko);
-export const boards = ['notice', 'research', 'award', 'scholarship', 'major', 'gallery', 'archive', 'events', 'alumni_news', 'promo', 'capstone', 'festival', 'videos'] as const;
+export const boards = ['notice', 'academic', 'research', 'award', 'scholarship', 'major', 'gallery', 'archive', 'events', 'alumni_news', 'promo', 'capstone', 'festival', 'videos'] as const;
 /** Which nav section/sub a board belongs to (for hero + tabs). */
 export const boardSection: Record<string, [string, string]> = {
   alumni_news: ['alumni', 'news'], promo: ['undergraduate', 'promo'], capstone: ['undergraduate', 'capstone'], festival: ['undergraduate', 'festival'], videos: ['undergraduate', 'videos'],

@@ -7,7 +7,7 @@ const safe = async <T,>(fn: () => Promise<{ data: T | null; error: any }>, fallb
   catch (e: any) { console.error(e?.message); return fallback; }
 };
 
-const homeBoards = ['notice', 'research', 'award', 'alumni_news'] as const;
+const homeBoards = ['notice', 'academic', 'research', 'award', 'alumni_news'] as const;
 
 export async function getHomeData() {
   const sb = createPublicClient();

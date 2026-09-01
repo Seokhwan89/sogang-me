@@ -13,7 +13,7 @@ export const ui = {
   ko: {
     home: '홈', more: '더보기', all: '전체', search: '검색', date: '날짜', views: '조회', author: '작성자',
     attachments: '첨부파일', list: '목록', prev: '이전', next: '다음', noPosts: '등록된 게시물이 없습니다.',
-    notice: '공지사항', research: '연구성과', award: '수상', scholarship: '장학·취업정보', major: '심화전공',
+    notice: '일반공지', academic: '학사공지', research: '연구성과', award: '수상', scholarship: '장학·취업정보', major: '심화전공',
     gallery: '갤러리', archive: '자료실', events: '외부 행사', reservation: '사용시설 예약', alumni_news: '동문·구성원 소식', promo: '전공 홍보자료', capstone: '창의적종합설계', festival: '학술제 학부생 발표', videos: '추천 영상',
     quick: '바로가기', seminar: '세미나실', meeting: '학과회의실', drafting: '제도실', server: '공용서버',
     ugAdmission: '학부 입학', gradAdmission: '대학원 입학', ureca: 'URECA 인턴', contact: '문의',
@@ -31,7 +31,7 @@ export const ui = {
   en: {
     home: 'Home', more: 'More', all: 'All', search: 'Search', date: 'Date', views: 'Views', author: 'Author',
     attachments: 'Attachments', list: 'List', prev: 'Prev', next: 'Next', noPosts: 'No posts yet.',
-    notice: 'Notice', research: 'Research', award: 'Awards', scholarship: 'Scholarship & Careers', major: 'Advanced Major',
+    notice: 'General Notice', academic: 'Academic Notice', research: 'Research', award: 'Awards', scholarship: 'Scholarship & Careers', major: 'Advanced Major',
     gallery: 'Gallery', archive: 'Downloads', events: 'External Events', reservation: 'Facility Reservation', alumni_news: 'Alumni & Community', promo: 'Intro Materials', capstone: 'Capstone Design', festival: 'Student Research Festival', videos: 'Recommended Videos',
     quick: 'Quick links', seminar: 'Seminar room', meeting: 'Meeting room', drafting: 'Drafting room', server: 'Shared servers',
     ugAdmission: 'Undergraduate Admission', gradAdmission: 'Graduate Admission', ureca: 'URECA Intern', contact: 'Contact',
