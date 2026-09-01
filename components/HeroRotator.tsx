@@ -37,7 +37,11 @@ export default function HeroRotator({ videos }: { videos: HeroVideoItem[] }) {
     return () => clearInterval(t);
   }, [order]);
 
-  const active = order ? order[pos % order.length] : -1;
+  const n = order?.length || 0;
+  const active = order ? order[pos % n] : -1;
+  // 14개를 전부 내려받으면 첫 재생이 느려지므로, 직전·현재·다음 3개만 마운트한다.
+  // 직전 것은 크로스페이드가 끝날 때까지 남겨 두는 용도.
+  const mounted = order ? new Set([order[(pos - 1 + n) % n], active, order[(pos + 1) % n]]) : new Set<number>();
 
   useEffect(() => {
     refs.current.forEach((v, i) => {
@@ -55,11 +59,11 @@ export default function HeroRotator({ videos }: { videos: HeroVideoItem[] }) {
         <img key={v.poster} src={v.poster} alt="" className="hero-fade absolute inset-0 w-full h-full object-cover"
           style={{ animationDuration: `${cycle}s`, animationDelay: `${i * 5.5 - cycle}s` }} />
       ))}
-      {/* JS가 살아 있으면 영상 레이어가 위에서 재생·순환 */}
-      {order && videos.map((v, i) => (
-        <video key={v.src} ref={(el) => { refs.current[i] = el; }} src={v.src} autoPlay muted playsInline loop preload={i === order[0] ? 'auto' : 'metadata'} poster={v.poster}
+      {/* JS가 살아 있으면 영상 레이어가 위에서 재생·순환 — 현재/다음/직전만 로드 */}
+      {order && videos.map((v, i) => mounted.has(i) ? (
+        <video key={v.src} ref={(el) => { refs.current[i] = el; }} src={v.src} autoPlay={i === active} muted playsInline loop preload="auto" poster={v.poster}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ease-in-out ${i === active ? 'opacity-100' : 'opacity-0'}`} />
-      ))}
+      ) : null)}
     </div>
   );
 }
