@@ -3,7 +3,7 @@ import { setUreca } from '@/app/admin/actions';
 import { urecaTerms } from '@/lib/nav';
 export default async function UrecaAdmin({ searchParams }: { searchParams: { year?: string; term?: string } }) {
   const sb = createClient();
-  let q = sb.from('ureca_applications').select('*').order('created_at', { ascending: false }).limit(500);
+  let q = sb.from('ureca_applications').select('*').order('created_at', { ascending: false }).limit(2500);
   if (searchParams.year) q = q.eq('year', Number(searchParams.year));
   if (searchParams.term) q = q.eq('term', searchParams.term);
   const { data } = await q;
@@ -26,7 +26,7 @@ export default async function UrecaAdmin({ searchParams }: { searchParams: { yea
             <p className="font-bold">{r.name} <span className="font-normal text-sg-steel">{r.student_id} · {r.semester}</span></p>
             <p className="text-[13px] text-sg-steel mt-1">{r.year} {tk(r.term)} · {String(r.created_at).slice(0, 10)}</p>
             <p className="text-[13px] mt-1">{r.phone} · <a href={`mailto:${r.email}`} className="underline">{r.email}</a></p>
-            <p className="mt-1 text-[12px]"><span className={`px-2 py-0.5 ${r.status === 'accepted' ? 'bg-green-100 text-green-800' : r.status === 'rejected' ? 'bg-gray-200' : 'bg-sg-cardinal text-white'}`}>{r.status === 'accepted' ? '선발' : r.status === 'rejected' ? '미선발' : '검토 중'}</span></p>
+            <p className="mt-1 text-[12px]"><span className={`px-2 py-0.5 ${r.status === 'accepted' ? 'bg-green-100 text-green-800' : r.status === 'rejected' ? 'bg-gray-200' : r.status === 'archived' ? 'bg-sg-mist text-sg-gray11' : 'bg-sg-cardinal text-white'}`}>{r.status === 'accepted' ? '선발' : r.status === 'rejected' ? '미선발' : r.status === 'archived' ? '이관 기록' : '검토 중'}</span></p>
           </div>
           <div className="text-[13px]">
             <ol className="space-y-1">{(r.choices || []).sort((a: any, b: any) => a.rank - b.rank).map((c: any) => <li key={c.rank}><span className="font-bold text-sg-cardinal">{c.rank}지망</span> {c.lab} <span className="text-sg-steel">({c.prof})</span></li>)}</ol>
