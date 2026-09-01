@@ -54,6 +54,7 @@
 - 기존 국문 전용 게시글의 영문 벌크 번역 — 클라이언트 스크립트에서 Supabase anon key 접근 문제로 중단됨. 서버 사이드 스크립트 또는 `/adm` 경로로 재접근 필요. 이관되는 legacy 게시글도 동일 파이프라인 대상
 - **저장 구조 판단 기준(2026-09-01 합의)**: 현 구조(Supabase=DB·신규 업로드 / R2=legacy 파일 / Vercel=호스팅) 유지. Cloudflare로 전부 통합(D1 등)은 백엔드 재작성 대비 이득이 없어 하지 않기로 함. 단, Supabase Storage가 다시 1GB에 근접하면 그때 신규 업로드 경로를 R2로 전환 검토
 - **⚠️ Vercel 프로젝트 이전 후유증 추가 발견(2026-09-01)**: `RESEND_API_KEY`도 8/31 이전 때 Secret 미리보기 문자열(`re_aBcDe…`)이 잘린 채 들어가 있어 **이전 후 모든 알림 메일이 조용히 실패**하고 있었음(코드가 실패 시 무음 처리). resend.com에서 새 키 발급(`sogang-me-vercel`) → Vercel env 교체 → Redeploy로 해결, 실제 예약·URECA 알림 수신 확인. **교훈: 옛 프로젝트에서 넘어온 env 값은 전부 원본 서비스에서 재발급이 원칙** (Supabase 3개는 8/31에, Resend는 9/1에 처리 — 다른 잘린 값이 더 없는지 env 목록 훑어볼 것). 옛 Resend 키(sogang-me-website)는 삭제 권장
+- ✅ **예약 알림 → 행정실 전달 완료(2026-09-01 검증)**: 예약·URECA 신청 → Resend 발송 → 학과 Gmail 수신 → Gmail 필터(from:onboarding@resend.dev)가 박현주 선생님(sgphj@sogang.ac.kr)께 자동 전달 — 실제 테스트로 양쪽 수신 확인. (원래 항목 ↓)
 - **예약 알림 수신자 (방법 A로 운영 결정, 2026-09-01)**: Resend가 테스트 발신자(onboarding@resend.dev) 상태라 **학과 Gmail로만 발송 가능** — /adm의 알림 이메일 칸에 다른 주소를 추가하면 발송 전체가 거부되므로 금지(관리자 설정 화면에 경고 기재됨). 행정선생님(박현주) 전달은 **Gmail 자동 전달**(전달 주소 등록→본인 승인→onboarding@resend.dev 필터로 전달)로 처리 — 책임자가 직접 설정 예정. 정식 해법(방법 B)은 Resend에 me.sogang.ac.kr 발신 도메인 인증(디지털정보처 DNS 레코드 요청) 후 NOTIFY_FROM 변경 — 그때는 알림 칸에 쉼표로 다중 수신자 직접 지정 가능(코드 지원 완료)
 - 콘텐츠 채우기: 창의적종합설계 아카이브(조원·주제 xlsx 있음), 학술제 학부생 발표 게시판, 홍보자료, 커뮤니티 뉴스
 - 자동번역을 Google/MyMemory 무료 엔드포인트에서 Claude API(`ANTHROPIC_API_KEY`)로 업그레이드하는 안 — 미착수
