@@ -22,7 +22,12 @@
 - **SEO 구축 완료**: 사이트맵 확장(게시글 4,638·교수 56·고정 48 = 4,742 URL, 1시간 재생성) + robots에 /api 차단 + Google Search Console 등록(URL 접두어 방식, 메타 태그 `app/layout.tsx`) + sitemap.xml 제출 → **상태 성공, 4,742페이지 발견 확인**. 검색 결과의 옛 사이트 스니펫은 재크롤링으로 수 일~2주 내 교체 예상
 - **옛 URL 리다이렉트 구축(middleware.ts)**: 구글·외부 사이트(공과대학 enge 등)에 남은 옛 링크 대응 — `/english`→`/en`, `/index.php`·`/v2/*`·`/kor/*`→홈, 그누보드 게시글 `board.php?bo_table=X&wr_id=N`은 **legacy_id(g5/g4:테이블:번호) DB 조회로 이관된 새 게시글에 정확 연결**(검증: sub6_1/979→/ko/board/notice/2390), 예약 게시판(sub6_7*)→/ko/reservation, 테이블만 있으면 게시판 목록 매핑(sub6_1→notice 등). 전부 308 영구 리다이렉트라 구글이 새 URL로 인덱스를 이전함
 - **언어 감지 수정**: 언어 선택 쿠키(`sg_lang`)는 헤더 전환 버튼(`?setlang=1`)을 눌렀을 때만 저장 — 옛 영문 링크로 유입된 한국어 사용자가 영어에 고착되던 문제 해결(기존 `locale` 쿠키는 무시됨). 첫 방문 감지 순서: 쿠키 → 국가(geo) → Accept-Language
-- **옛 사이트 접속(me-old.sogang.ac.kr)**: DNS는 183.110.224.211로 등록됨. **호스팅 업체에 서버 vhost 매핑 요청 필요**(미요청 상태) — 요청 전까지는 hosts 파일 우회로만 접속 가능
+- **옛 홈페이지 접속 방법(전환기, 인수인계 필독)**: 도메인이 새 사이트로 넘어가 옛 사이트는 일반 주소로 접속 불가. 옛 서버(nginx, **183.110.224.211**)는 살아 있으며 Host가 me.sogang.ac.kr일 때만 응답(IP 직접 접속은 403). 접속 절차(Windows):
+  1. 메모장을 **관리자 권한**으로 실행 → `C:\Windows\System32\drivers\etc\hosts` 열기 → 맨 아래 `183.110.224.211 me.sogang.ac.kr` 추가 → 저장
+  2. cmd에서 `ipconfig /flushdns`
+  3. **`http://` 를 붙여** `http://me.sogang.ac.kr` 접속. 새 사이트를 연 적 있는 브라우저는 HSTS 때문에 https로 강제되어 실패할 수 있음 → 안 쓰던 브라우저(Edge/Firefox)를 쓰거나 `chrome://net-internals/#hsts`에서 me.sogang.ac.kr 삭제 후 접속
+  4. **확인 후 반드시 hosts 줄 삭제 + flushdns** (안 지우면 그 PC에서 새 홈페이지 접속 불가)
+  - 영구적 대안: 호스팅 업체에 "`me-old.sogang.ac.kr` 도메인을 서버에 매핑해 달라"고 요청(DNS는 이미 183.110.224.211로 등록됨, 디지털정보처 2026-09-01 처리). 업체 요청은 미발송 상태
 - **Supabase Storage → Cloudflare R2 무료 이전 완료**: legacy 미디어 3,248개(1.28GB)를 R2 버킷 `sogang-me-media`(APAC, Cloudflare 계정=학과 Gmail)로 복사(크기 전수 검증, 오류 0) → DB URL 5,088개 치환(posts 2,073행·faculty 25행, 잔존 0 전수 확인) → `content/assets.ts`의 정적 참조 교체 → 프로덕션에서 R2 서빙 확인 → Supabase `legacy/` 삭제. **Supabase Storage 3MB로 복귀(무료 한도 해소)**. 공개 URL: `https://pub-752d1dfed9d84e0f957284985c30f806.r2.dev` (r2.dev 개발용 URL — 학교 도메인 연결 시 커스텀 도메인 권장). 신규 업로드(/adm)는 계속 Supabase로 가므로 양쪽 다 무료 한도 내 유지됨. R2 무료 한도: 저장 10GB·egress 무료. 이전용 API 토큰(sogang-me-migration)은 **폐기 권장**(책임자에게 안내됨). 초과 과금 방지용 Cloudflare Notifications 설정도 안내됨
 
 ## 완료 (2026-08-31 밤 추가)
