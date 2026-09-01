@@ -83,11 +83,18 @@ export async function middleware(req: NextRequest) {
   // 2) Locale routing: /ko/... or /en/... ; otherwise detect
   const first = pathname.split('/')[1];
   if (isLocale(first)) {
-    const res = NextResponse.next();
-    res.cookies.set('locale', first, { path: '/', maxAge: 60 * 60 * 24 * 365 });
-    return res;
+    // 언어 선택은 헤더의 전환 버튼(?setlang=1)을 눌렀을 때만 기억한다.
+    // 링크를 타고 들어온 것만으로 기억하면 옛 영문 링크로 유입된 한국어 사용자가 영어에 갇힌다.
+    if (req.nextUrl.searchParams.has('setlang')) {
+      const url = req.nextUrl.clone();
+      url.searchParams.delete('setlang');
+      const res = NextResponse.redirect(url, 307);
+      res.cookies.set('sg_lang', first, { path: '/', maxAge: 60 * 60 * 24 * 365 });
+      return res;
+    }
+    return NextResponse.next();
   }
-  const cookie = req.cookies.get('locale')?.value;
+  const cookie = req.cookies.get('sg_lang')?.value;
   const country = req.headers.get('x-vercel-ip-country') || req.geo?.country || '';
   const accept = req.headers.get('accept-language') || '';
   let locale = 'ko';

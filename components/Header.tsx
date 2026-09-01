@@ -27,7 +27,8 @@ export default function Header({ locale }: { locale: Locale }) {
   const [mobile, setMobile] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const other: Locale = locale === 'ko' ? 'en' : 'ko';
-  const switchHref = pathname.replace(/^\/(ko|en)/, `/${other}`);
+  // ?setlang=1: 미들웨어가 이 표시가 있을 때만 언어 선택을 쿠키로 기억한다
+  const switchHref = pathname.replace(/^\/(ko|en)/, `/${other}`) + '?setlang=1';
   useEffect(() => { const f = () => setScrolled(window.scrollY > 10); f(); window.addEventListener('scroll', f, { passive: true }); return () => window.removeEventListener('scroll', f); }, []);
   useEffect(() => { setOpen(false); setMega(false); }, [pathname]);
 
