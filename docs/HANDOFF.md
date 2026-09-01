@@ -53,7 +53,7 @@
 - **R2 미디어 1회 스냅샷 (권장, 미실행)**: legacy 파일은 불변이라 정기 백업 불필요하지만, Cloudflare 계정 사고(실수 삭제·해킹·정지) 대비 1:1 사본 1회 권장. `scripts/r2-archive-colab.py`를 Colab에서 실행하면 드라이브에 `sogang-me-r2-backup_날짜.tar`(1.3GB) 생성. 파일 목록은 `scripts/r2-inventory.json`(3,253개, 크기 검증용)
 - 기존 국문 전용 게시글의 영문 벌크 번역 — 클라이언트 스크립트에서 Supabase anon key 접근 문제로 중단됨. 서버 사이드 스크립트 또는 `/adm` 경로로 재접근 필요. 이관되는 legacy 게시글도 동일 파이프라인 대상
 - **저장 구조 판단 기준(2026-09-01 합의)**: 현 구조(Supabase=DB·신규 업로드 / R2=legacy 파일 / Vercel=호스팅) 유지. Cloudflare로 전부 통합(D1 등)은 백엔드 재작성 대비 이득이 없어 하지 않기로 함. 단, Supabase Storage가 다시 1GB에 근접하면 그때 신규 업로드 경로를 R2로 전환 검토
-- **예약 알림 수신자**: 코드는 준비 완료(2026-09-01) — `/adm` → 설정 → "신청 알림 받을 이메일"에 **쉼표로 여러 명 지정 가능**하게 개선(lib/notify.ts). 박현주 선생님 서강대 메일을 추가 입력하는 것만 남음(책임자가 /adm에서 직접). 첫 예약 알림이 학교 메일 스팸함으로 가지 않는지 1회 확인 권장(발신자가 resend.dev)
+- **예약 알림 수신자 (방법 A로 운영 결정, 2026-09-01)**: Resend가 테스트 발신자(onboarding@resend.dev) 상태라 **학과 Gmail로만 발송 가능** — /adm의 알림 이메일 칸에 다른 주소를 추가하면 발송 전체가 거부되므로 금지(관리자 설정 화면에 경고 기재됨). 행정선생님(박현주) 전달은 **Gmail 자동 전달**(전달 주소 등록→본인 승인→onboarding@resend.dev 필터로 전달)로 처리 — 책임자가 직접 설정 예정. 정식 해법(방법 B)은 Resend에 me.sogang.ac.kr 발신 도메인 인증(디지털정보처 DNS 레코드 요청) 후 NOTIFY_FROM 변경 — 그때는 알림 칸에 쉼표로 다중 수신자 직접 지정 가능(코드 지원 완료)
 - 콘텐츠 채우기: 창의적종합설계 아카이브(조원·주제 xlsx 있음), 학술제 학부생 발표 게시판, 홍보자료, 커뮤니티 뉴스
 - 자동번역을 Google/MyMemory 무료 엔드포인트에서 Claude API(`ANTHROPIC_API_KEY`)로 업그레이드하는 안 — 미착수
 - **학교 도메인(me.sogang.ac.kr) 연결 — DNS 반영 완료(2026-09-01 오전, 디지털정보처 김현일 선생님 처리)**: CNAME `me.sogang.ac.kr`→`914a4250d048c5d9.vercel-dns-017.com.`, TXT `_vercel.sogang.ac.kr`→`vc-domain-verify=...` 모두 전파 확인됨. **남은 것: Vercel Domains에서 Refresh를 눌러 소유 확인 통과 → 인증서 자동 발급** (안 누르면 ERR_CONNECTION_CLOSED 상태 지속). 이후 R2 커스텀 도메인(media 서브도메인) 전환 검토
