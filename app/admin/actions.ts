@@ -104,7 +104,14 @@ export async function saveFaculty(fd: FormData) {
   const bdg = buildingOf(row.building);
   row.office = bdg ? (row.room ? `${bdg.ko}(${bdg.code}) ${row.room}호` : `${bdg.ko}(${bdg.code})`) : null;
   row.name_ko = str(fd, 'name_ko'); row.sort_order = Number(str(fd, 'sort_order') || 100);
-  row.is_emeritus = bool(fd, 'is_emeritus'); row.published = bool(fd, 'published');
+  // 구분(전임/명예/석좌): category 셀렉트가 is_emeritus와 field='chair'를 결정한다
+  const category = str(fd, 'category');
+  if (category) {
+    row.is_emeritus = category === 'emeritus';
+    if (category === 'chair') row.field = 'chair';
+    else if (row.field === 'chair') row.field = null;
+  } else row.is_emeritus = bool(fd, 'is_emeritus');
+  row.published = bool(fd, 'published');
   row.groups = researchGroupDefs.filter((g) => bool(fd, `group_${g.id}`)).map((g) => g.id);
   /* 교수 정보도 같은 정책: 국문이 바뀐 항목만 다시 번역 */
   const mode = str(fd, 'translate_mode') || 'changed';
