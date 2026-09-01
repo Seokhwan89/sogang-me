@@ -40,6 +40,16 @@ async function legacyRedirect(req: NextRequest): Promise<NextResponse | null> {
     return to('/');
   }
 
+  // 옛 메뉴 그룹 페이지: /bbs/group.php?gr_id=sub2, /bbs/group_eng.php?gr_id=eng_sub2 등
+  if (pathname.startsWith('/bbs/') || pathname.startsWith('/v2/bbs/')) {
+    const gr = searchParams.get('gr_id') || '';
+    const eng = pathname.includes('group_eng') || gr.startsWith('eng');
+    const n = (gr.match(/sub(\d)/) || [])[1];
+    const secMap: Record<string, string> = { '1': '/about/intro', '2': '/faculty', '3': '/undergraduate/admission', '4': '/graduate/admission', '5': '/graduate/areas', '6': '/board/notice' };
+    if (n && secMap[n]) return to(`/${eng ? 'en' : 'ko'}${secMap[n]}`);
+    return to(eng ? '/en' : '/');
+  }
+
   // 그 밖의 옛 경로(/v2/…, /kor/…)는 홈으로
   if (pathname === '/v2' || pathname.startsWith('/v2/') || pathname === '/kor' || pathname.startsWith('/kor/')) return to('/');
   return null;
@@ -93,6 +103,6 @@ export const config = {
   matcher: [
     '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)',
     // 옛 사이트 리다이렉트 대상 (점(.)이 들어간 경로는 위 일반 매처에서 제외되므로 명시)
-    '/bbs/board.php', '/v2/bbs/board.php', '/index.php', '/v2/:path*', '/english/:path*',
+    '/bbs/:path*', '/v2/:path*', '/index.php', '/english/:path*',
   ],
 };
