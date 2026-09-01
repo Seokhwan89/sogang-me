@@ -22,7 +22,7 @@
 - **SEO 구축 완료**: 사이트맵 확장(게시글 4,638·교수 56·고정 48 = 4,742 URL, 1시간 재생성) + robots에 /api 차단 + Google Search Console 등록(URL 접두어 방식, 메타 태그 `app/layout.tsx`) + sitemap.xml 제출 → **상태 성공, 4,742페이지 발견 확인**. 검색 결과의 옛 사이트 스니펫은 재크롤링으로 수 일~2주 내 교체 예상
 - **옛 URL 리다이렉트 구축(middleware.ts)**: 구글·외부 사이트(공과대학 enge 등)에 남은 옛 링크 대응 — `/english`→`/en`, `/index.php`·`/v2/*`·`/kor/*`→홈, 그누보드 게시글 `board.php?bo_table=X&wr_id=N`은 **legacy_id(g5/g4:테이블:번호) DB 조회로 이관된 새 게시글에 정확 연결**(검증: sub6_1/979→/ko/board/notice/2390), 예약 게시판(sub6_7*)→/ko/reservation, 테이블만 있으면 게시판 목록 매핑(sub6_1→notice 등). 전부 308 영구 리다이렉트라 구글이 새 URL로 인덱스를 이전함
 - **언어 감지 수정**: 언어 선택 쿠키(`sg_lang`)는 헤더 전환 버튼(`?setlang=1`)을 눌렀을 때만 저장 — 옛 영문 링크로 유입된 한국어 사용자가 영어에 고착되던 문제 해결(기존 `locale` 쿠키는 무시됨). 첫 방문 감지 순서: 쿠키 → 국가(geo) → Accept-Language
-- **옛 홈페이지 접속 방법(전환기, 인수인계 필독)**: 도메인이 새 사이트로 넘어가 옛 사이트는 일반 주소로 접속 불가. 옛 서버(nginx, **183.110.224.211**)는 살아 있으며 Host가 me.sogang.ac.kr일 때만 응답(IP 직접 접속은 403). 접속 절차(Windows):
+- **옛 홈페이지 접속 방법(전환기, 인수인계 필독)**: 가장 쉬운 방법 = `scripts/옛홈페이지열기.bat`을 더블클릭(행정실 배포용, Edge 전용 창으로 열림, 관리자 권한·설정 변경·원상복구 불필요). 아래 hosts 방식은 bat이 안 될 때의 수동 대안. 도메인이 새 사이트로 넘어가 옛 사이트는 일반 주소로 접속 불가. 옛 서버(nginx, **183.110.224.211**)는 살아 있으며 Host가 me.sogang.ac.kr일 때만 응답(IP 직접 접속은 403). 접속 절차(Windows):
   1. 메모장을 **관리자 권한**으로 실행 → `C:\Windows\System32\drivers\etc\hosts` 열기 → 맨 아래 `183.110.224.211 me.sogang.ac.kr` 추가 → 저장
   2. cmd에서 `ipconfig /flushdns`
   3. **`http://` 를 붙여** `http://me.sogang.ac.kr` 접속. 새 사이트를 연 적 있는 브라우저는 HSTS 때문에 https로 강제되어 실패할 수 있음 → 안 쓰던 브라우저(Edge/Firefox)를 쓰거나 `chrome://net-internals/#hsts`에서 me.sogang.ac.kr 삭제 후 접속
