@@ -53,10 +53,13 @@ export default function Header({ locale }: { locale: Locale }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          {/* 옛 홈페이지 상단바에 있던 BK21 바로가기 — 언어 버튼과 같은 디자인 언어로 (모바일은 대학원과정 메뉴에서) */}
+          {/* 옛 홈페이지 상단바에 있던 BK21 바로가기 — 공식 로고를 쓰되 평소엔 모노톤·반투명으로
+              헤더에 녹아들게 하고, 마우스를 올리면 원색이 살아난다 (모바일은 대학원과정 메뉴에서) */}
           <a href="http://bk21me.sogang.ac.kr" target="_blank" rel="noreferrer" title="BK21 교육연구팀 (BK21 FOUR)"
-            className="hidden md:flex items-center px-3 py-2 border border-sg-line text-[13px] font-semibold text-sg-ink hover:border-sg-ink">
-            BK<span className="text-sg-cardinal">21</span><span className="ml-1.5 text-[10px] font-bold tracking-wider text-sg-gray9">FOUR</span>
+            className="hidden md:flex items-center px-3 py-2 border border-sg-line hover:border-sg-ink group/bk">
+            <img src="/images/brand/bk21-four.png" alt="BK21 FOUR" width={44} height={20}
+              style={{ width: 44, height: 20, maxWidth: 'none' }}
+              className="grayscale opacity-55 transition duration-200 group-hover/bk:grayscale-0 group-hover/bk:opacity-100" />
           </a>
           <Link href={switchHref} onClick={switchLang} className="flex items-center gap-2 px-3 py-2 border border-sg-line text-[13px] font-semibold text-sg-ink hover:border-sg-ink" aria-label={other === 'en' ? 'Switch to English' : '한국어로 전환'}>
             <Flag code={other} /> {other === 'en' ? 'ENG' : '한국어'}
