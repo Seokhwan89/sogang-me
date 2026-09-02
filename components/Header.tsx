@@ -53,6 +53,11 @@ export default function Header({ locale }: { locale: Locale }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          {/* 옛 홈페이지 상단바에 있던 BK21 바로가기 — 사업단 로고 버튼 (모바일은 대학원과정 메뉴에서) */}
+          <a href="http://bk21me.sogang.ac.kr" target="_blank" rel="noreferrer" title="BK21 교육연구팀 (BK21 FOUR)"
+            className="hidden md:flex items-center px-2.5 py-2 border border-sg-line hover:border-sg-ink bg-white/70">
+            <img src="/images/brand/bk21-four.png" alt="BK21 FOUR" width={47} height={22} style={{ width: 47, height: 22, maxWidth: 'none' }} />
+          </a>
           <Link href={switchHref} onClick={switchLang} className="flex items-center gap-2 px-3 py-2 border border-sg-line text-[13px] font-semibold text-sg-ink hover:border-sg-ink" aria-label={other === 'en' ? 'Switch to English' : '한국어로 전환'}>
             <Flag code={other} /> {other === 'en' ? 'ENG' : '한국어'}
           </Link>
