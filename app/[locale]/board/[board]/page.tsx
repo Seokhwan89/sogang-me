@@ -19,7 +19,8 @@ export default async function BoardList({ params, searchParams }: { params: { lo
   const { locale: l, board } = params; const ko = l === 'ko';
   if (!(boards as readonly string[]).includes(board)) notFound();
   const special = ['promo', 'capstone', 'festival', 'videos'].includes(board);
-  const page = Math.max(1, Number(searchParams.page || 1)); const q = searchParams.q || '';
+  const pageN = Number(searchParams.page); // 숫자가 아니면 NaN → 1페이지로 (NaN이 range()에 흘러가 빈 화면이 되지 않게)
+  const page = Number.isFinite(pageN) && pageN >= 1 ? Math.floor(pageN) : 1; const q = searchParams.q || '';
   const { posts, total } = await getPosts(board, special ? 1 : page, special ? 200 : PER, q);
   const pages = Math.max(1, Math.ceil(total / PER));
   const [section, current] = boardSection[board] || ['board', board];

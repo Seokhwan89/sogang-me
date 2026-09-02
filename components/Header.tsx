@@ -27,8 +27,16 @@ export default function Header({ locale }: { locale: Locale }) {
   const [mobile, setMobile] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const other: Locale = locale === 'ko' ? 'en' : 'ko';
-  // ?setlang=1: 미들웨어가 이 표시가 있을 때만 언어 선택을 쿠키로 기억한다
+  // ?setlang=1: 미들웨어가 이 표시가 있을 때만 언어 선택을 쿠키로 기억한다.
+  // 클릭 시점에 현재 쿼리(페이지·검색어 등)를 보존해 언어를 바꿔도 보던 목록이 유지되게 한다.
+  // (useSearchParams는 SSG 페이지에서 Suspense 경계를 요구하므로 쓰지 않는다)
   const switchHref = pathname.replace(/^\/(ko|en)/, `/${other}`) + '?setlang=1';
+  const switchLang = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const q = new URLSearchParams(window.location.search);
+    q.set('setlang', '1');
+    window.location.href = pathname.replace(/^\/(ko|en)/, `/${other}`) + `?${q.toString()}`;
+  };
   useEffect(() => { const f = () => setScrolled(window.scrollY > 10); f(); window.addEventListener('scroll', f, { passive: true }); return () => window.removeEventListener('scroll', f); }, []);
   useEffect(() => { setOpen(false); setMega(false); }, [pathname]);
 
@@ -45,7 +53,7 @@ export default function Header({ locale }: { locale: Locale }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link href={switchHref} className="flex items-center gap-2 px-3 py-2 border border-sg-line text-[13px] font-semibold text-sg-ink hover:border-sg-ink" aria-label={other === 'en' ? 'Switch to English' : '한국어로 전환'}>
+          <Link href={switchHref} onClick={switchLang} className="flex items-center gap-2 px-3 py-2 border border-sg-line text-[13px] font-semibold text-sg-ink hover:border-sg-ink" aria-label={other === 'en' ? 'Switch to English' : '한국어로 전환'}>
             <Flag code={other} /> {other === 'en' ? 'ENG' : '한국어'}
           </Link>
           <button onClick={() => setOpen(!open)} className="lg:hidden p-2 text-sg-ink" aria-label="Menu" aria-expanded={open}>

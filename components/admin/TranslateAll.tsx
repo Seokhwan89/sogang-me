@@ -8,15 +8,17 @@ export default function TranslateAll({ provider = 'free' }: { provider?: string 
   async function run(target: 'posts' | 'faculty' | 'pages', force = false) {
     if (force && !confirm(`${target === 'posts' ? '게시글' : '교수진'} 영문을 모두 다시 번역합니다.\n관리자가 직접 손본 영문도 덮어씁니다. 계속할까요?`)) return;
     setBusy(true); setLog((l) => [...l, `${target}${force ? ' (재번역)' : ''}: 시작`]);
-    let total = 0;
+    let total = 0; let failed = 0; let cursor = 0;
     for (let i = 0; i < 400; i++) {
       try {
-        const r = await fetch('/api/translate-all', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target, batch: 3, force }) });
+        const r = await fetch('/api/translate-all', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target, batch: 3, force, cursor }) });
         const j = await r.json();
         if (!r.ok) { setLog((l) => [...l, `오류: ${j.error}`]); break; }
-        total += j.done;
-        setLog((l) => [...l.slice(0, -1), `${target}${force ? ' (재번역)' : ''}: ${total}건 완료 · 남은 ${j.remaining}건${j.errors?.length ? ` · 실패 ${j.errors.length}` : ''}`]);
-        if (j.remaining === 0 || j.done === 0) break;
+        total += j.done; failed += j.errors?.length || 0;
+        if (j.cursor) cursor = j.cursor; // 실패한 행은 건너뛰고 진행 — 같은 행에 유료 호출이 반복되지 않게
+        setLog((l) => [...l.slice(0, -1), `${target}${force ? ' (재번역)' : ''}: ${total}건 완료 · 남은 ${j.remaining}건${failed ? ` · 실패 ${failed} (다시 실행하면 재시도)` : ''}`]);
+        if (j.remaining === 0 || (j.done === 0 && !(j.errors?.length))) break;
+        if (j.done === 0 && j.errors?.length && target === 'pages') break; // pages는 커서가 없어 실패만 남으면 종료
       } catch (e: any) { setLog((l) => [...l, '중단: ' + e.message]); break; }
     }
     setBusy(false);

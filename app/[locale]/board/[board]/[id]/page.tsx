@@ -6,7 +6,7 @@ import { t, T, type Locale } from '@/lib/i18n';
 import { notFound } from 'next/navigation';
 import YouTube from '@/components/YouTube';
 import ViewCounter from '@/components/ViewCounter';
-import { toHtml } from '@/lib/html';
+import { toHtml, downloadUrl } from '@/lib/html';
 import { boardSection, festivalCategories } from '@/lib/nav';
 export const revalidate = 60;
 
@@ -48,7 +48,7 @@ export default async function PostPage({ params }: { params: { locale: Locale; b
       {files.length > 0 && (
         <section className="mt-10 border border-sg-line p-5 bg-sg-mist/60">
           <p className="eyebrow">{T(l, 'attachments')}</p>
-          <ul className="mt-3 space-y-2">{files.map((f, i) => <li key={i}><a href={f.url} download className="flex items-center gap-2 text-[15px] hover:text-sg-cardinal"><span className="text-sg-cardinal">↓</span>{f.name}{f.size ? <span className="text-[12px] text-sg-gray9">({Math.round(f.size / 1024)} KB)</span> : null}</a></li>)}</ul>
+          <ul className="mt-3 space-y-2">{files.map((f, i) => <li key={i}><a href={downloadUrl(f.url, f.name)} download className="flex items-center gap-2 text-[15px] hover:text-sg-cardinal"><span className="text-sg-cardinal">↓</span>{f.name}{f.size ? <span className="text-[12px] text-sg-gray9">({Math.round(f.size / 1024)} KB)</span> : null}</a></li>)}</ul>
         </section>
       )}
       <nav className="mt-12 border-t border-b border-sg-line divide-y divide-sg-line text-[15px]">

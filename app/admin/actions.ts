@@ -37,6 +37,10 @@ export async function signOut() {
   const sb = createClient(); await sb.auth.signOut(); redirect(base());
 }
 
+/** 작성일 관례: created_at은 'KST 시각을 +00으로' 저장한다 (legacy 이관분과 동일 — 표시도 UTC 기준).
+ *  신규 글에 날짜만 오면 현재 KST 시각을, 백데이트면 09:00을 붙여 자정 동률·정렬 뒤틀림을 막는다. */
+const kstNowIso = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString();
+
 export async function savePost(fd: FormData) {
   const sb = await admin();
   const id = str(fd, 'id');
@@ -44,27 +48,39 @@ export async function savePost(fd: FormData) {
     board: str(fd, 'board'), title_ko: str(fd, 'title_ko'), title_en: nul(str(fd, 'title_en')),
     content_ko: toHtml(str(fd, 'content_ko')), content_en: nul(toHtml(str(fd, 'content_en'))),
     video_url: nul(str(fd, 'video_url')), term: nul(str(fd, 'term')), members: nul(str(fd, 'members')), advisor: nul(str(fd, 'advisor')), category: nul(str(fd, 'category')), sort_order: Number(str(fd, 'sort_order') || 100),
-    excerpt_ko: nul(str(fd, 'excerpt_ko')) || strip(str(fd, 'content_ko')), excerpt_en: nul(str(fd, 'excerpt_en')),
+    excerpt_ko: nul(str(fd, 'excerpt_ko')) || strip(str(fd, 'content_ko')),
     thumbnail_url: nul(str(fd, 'thumbnail_url')), author: str(fd, 'author') || '기계공학과',
     is_pinned: bool(fd, 'is_pinned'), show_on_home: bool(fd, 'show_on_home'), published: bool(fd, 'published'),
     images: JSON.parse(str(fd, 'images') || '[]'), attachments: JSON.parse(str(fd, 'attachments') || '[]'),
     updated_at: new Date().toISOString(),
   };
-  const created = str(fd, 'created_at'); if (created) row.created_at = created;
+  if (!row.title_ko.trim()) throw new Error('제목을 입력해 주세요.');
+
+  let prev: any = null;
+  if (id) { const { data } = await sb.from('posts').select('title_ko,content_ko,excerpt_ko,category,title_en,content_en,excerpt_en,category_en,created_at').eq('id', Number(id)).single(); prev = data; }
+  // excerpt_en·category_en은 폼에 입력칸이 없으므로 기존 값을 보존한다 (폼에 있으면 그 값 사용)
+  row.excerpt_en = fd.has('excerpt_en') ? nul(str(fd, 'excerpt_en')) : (prev?.excerpt_en ?? null);
+  row.category_en = fd.has('category_en') ? nul(str(fd, 'category_en')) : (prev?.category_en ?? null);
+  // 작성일: 날짜가 실제로 바뀌었을 때만 갱신 — 편집만 해도 시각이 자정으로 잘려 정렬·이전/다음이 뒤틀리는 것 방지
+  const created = str(fd, 'created_at');
+  const kstToday = kstNowIso().slice(0, 10);
+  if (created && created !== (prev?.created_at || '').slice(0, 10)) {
+    row.created_at = created === kstToday ? kstNowIso() : `${created}T09:00:00+00:00`;
+  } else if (!id && !created) row.created_at = kstNowIso();
 
   /* 번역 정책
    *  changed : 국문이 바뀐 항목만 다시 번역 (기본값) — 국문·영문이 어긋나는 것을 막습니다
    *  missing : 영문이 비어 있는 항목만 번역
    *  none    : 번역하지 않음 (영문을 직접 손봤거나 오타만 고친 경우)
-   * 관리자가 영문 칸을 직접 수정하면 그 항목은 자동 번역이 덮어쓰지 않습니다. */
+   * 관리자가 영문 칸을 직접 수정하면 그 항목은 자동 번역이 덮어쓰지 않습니다.
+   * 신규 글은 관리자가 영문을 입력해 두었으면 그 값을 존중하고, 비어 있을 때만 번역합니다. */
   const mode = str(fd, 'translate_mode') || 'changed';
   if (mode !== 'none') {
-    let prev: any = null;
-    if (id) { const { data } = await sb.from('posts').select('title_ko,content_ko,excerpt_ko,category,title_en,content_en,excerpt_en,category_en').eq('id', Number(id)).single(); prev = data; }
-    const editedEn = (k: string) => !!prev && nul(str(fd, k)) !== (prev[k] ?? null);   // 관리자가 영문을 직접 고쳤는지
+    const editedEn = (k: string) => fd.has(k) && !!prev && nul(str(fd, k)) !== (prev[k] ?? null);   // 관리자가 영문을 직접 고쳤는지 (폼에 있는 칸만)
     const koChanged = (k: string) => !prev || (row[k] || '') !== (prev[k] || '');
     const need = (koKey: string, enKey: string) =>
-      !!row[koKey] && !editedEn(enKey) && (mode === 'missing' ? !row[enKey] : (koChanged(koKey) || !row[enKey]));
+      !!row[koKey] && !editedEn(enKey) &&
+      (mode === 'missing' || !prev ? !row[enKey] : (koChanged(koKey) || !row[enKey]));
 
     const fields: Record<string, string> = {};
     if (need('title_ko', 'title_en')) fields.title = row.title_ko;
@@ -89,10 +105,30 @@ export async function savePost(fd: FormData) {
   redirect(`${base()}/posts?board=${row.board}`);
 }
 
+/** 이 URL을 다른 게시글도 쓰고 있으면 true — 공유 파일은 저장소에서 지우면 안 된다. */
+async function usedByOtherPost(sb: any, url: string, excludeId: number): Promise<boolean> {
+  const safeUrl = url.replace(/[",]/g, ''); // or() 필터 구문을 깨는 문자는 실사용 URL에 없다
+  const { data: a } = await sb.from('posts').select('id').neq('id', excludeId)
+    .or(`thumbnail_url.eq."${safeUrl}",content_ko.ilike."%${safeUrl}%",content_en.ilike."%${safeUrl}%"`).limit(1);
+  if (a && a.length) return true;
+  const { data: b } = await sb.from('posts').select('id').neq('id', excludeId).contains('images', [{ url }]).limit(1);
+  if (b && b.length) return true;
+  const { data: c } = await sb.from('posts').select('id').neq('id', excludeId).contains('attachments', [{ url }]).limit(1);
+  return !!(c && c.length);
+}
+
 export async function deletePost(fd: FormData) {
   const sb = await admin(); const id = Number(str(fd, 'id')); const board = str(fd, 'board');
   const { data: row } = await sb.from('posts').select('thumbnail_url,images,attachments,content_ko,content_en').eq('id', id).single();
-  if (row) await removeMedia(sb, row);   // 글을 지우면 첨부·본문 이미지도 저장소에서 함께 삭제
+  if (row) {
+    // 글을 지우면 첨부·본문 이미지도 저장소에서 함께 삭제 — 단, 다른 글이 같은 파일을 참조하면 남긴다
+    const urls = [row.thumbnail_url, ...(row.images || []).map((i: any) => i.url), ...(row.attachments || []).map((f: any) => f.url),
+      ...[...String(row.content_ko || '').matchAll(/src="([^"]+)"/g), ...String(row.content_en || '').matchAll(/src="([^"]+)"/g)].map((m) => m[1])].filter(Boolean);
+    const own: string[] = [];
+    for (const u of Array.from(new Set(urls))) if (!(await usedByOtherPost(sb, u, id))) own.push(u);
+    const paths = mediaPaths(own);
+    if (paths.length) await sb.storage.from('media').remove(paths);
+  }
   await sb.from('posts').delete().eq('id', id); revalidatePath('/', 'layout'); redirect(`${base()}/posts?board=${board}`);
 }
 
@@ -121,7 +157,8 @@ export async function saveFaculty(fd: FormData) {
     const editedEn = (k: string) => !!prev && nul(str(fd, k)) !== (prev[k] ?? null);
     const koChanged = (k: string) => !prev || (row[k] || '') !== (prev[k] || '');
     const need = (koKey: string, enKey: string) =>
-      !!row[koKey] && !editedEn(enKey) && (mode === 'missing' ? !row[enKey] : (koChanged(koKey) || !row[enKey]));
+      !!row[koKey] && !editedEn(enKey) &&
+      (mode === 'missing' || !prev ? !row[enKey] : (koChanged(koKey) || !row[enKey]));   // 신규는 영문 직접 입력을 존중
     const fields: Record<string, string> = {};
     if (need('lab_ko', 'lab_en')) fields.lab = row.lab_ko;
     if (need('research_ko', 'research_en')) fields.research = row.research_ko;
@@ -156,7 +193,7 @@ export async function savePage(fd: FormData) {
     const { data: prev } = await sb.from('pages').select('content_ko,content_en').eq('slug', slug).maybeSingle();
     const editedEn = !!prev && row.content_en !== (prev.content_en ?? null);
     const koChanged = !prev || row.content_ko !== (prev.content_ko || '');
-    const need = !editedEn && (mode === 'missing' ? !row.content_en : (koChanged || !row.content_en));
+    const need = !editedEn && (mode === 'missing' || !prev ? !row.content_en : (koChanged || !row.content_en));
     if (need) { const out = await translateKoToEn({ content: row.content_ko }); if (out?.content) row.content_en = out.content; }
   }
   const { error } = await sb.from('pages').upsert(row); if (error) throw new Error(error.message);
@@ -174,7 +211,14 @@ export async function setReservation(fd: FormData) {
 }
 export async function addReservation(fd: FormData) {
   const sb = await admin();
-  const { error } = await sb.from('reservations').insert({ facility: str(fd, 'facility'), date: str(fd, 'date'), start_time: str(fd, 'start_time'), end_time: str(fd, 'end_time'), user_name: str(fd, 'user_name'), purpose: nul(str(fd, 'purpose')), status: 'approved' });
+  const row = { facility: str(fd, 'facility'), date: str(fd, 'date'), start_time: str(fd, 'start_time'), end_time: str(fd, 'end_time'), user_name: str(fd, 'user_name'), purpose: nul(str(fd, 'purpose')), status: 'approved' };
+  if (!row.facility || !row.date || !row.start_time || !row.end_time || !row.user_name) throw new Error('필수 항목이 비어 있습니다.');
+  if (row.start_time >= row.end_time) throw new Error('종료 시간이 시작 시간보다 늦어야 합니다.');
+  const { data: clash } = await sb.from('reservations').select('start_time,end_time,user_name')
+    .eq('facility', row.facility).eq('date', row.date).neq('status', 'rejected')
+    .lt('start_time', row.end_time).gt('end_time', row.start_time).limit(3);
+  if (clash && clash.length) throw new Error(`이미 예약된 시간과 겹칩니다: ${clash.map((c: any) => `${c.start_time.slice(0, 5)}~${c.end_time.slice(0, 5)} ${c.user_name}`).join(', ')}`);
+  const { error } = await sb.from('reservations').insert(row);
   if (error) throw new Error(error.message); revalidatePath('/', 'layout'); redirect(`${base()}/reservations`);
 }
 
@@ -202,7 +246,12 @@ export async function deleteBanner(fd: FormData) {
 }
 export async function addAdmin(fd: FormData) {
   const sb = await admin(); const email = str(fd, 'email').trim().toLowerCase();
-  if (email) await sb.from('admins').insert({ email }); redirect(`${base()}/settings`);
+  if (email) {
+    const { error } = await sb.from('admins').insert({ email });
+    // admins 쓰기 정책(schema_v8)이 없으면 RLS가 조용히 거부한다 — 성공한 척하지 않는다
+    if (error) throw new Error(`관리자 추가 실패: ${error.message} (Supabase에 schema_v8.sql을 적용했는지 확인)`);
+  }
+  redirect(`${base()}/settings`);
 }
 
 export async function setUreca(fd: FormData) {

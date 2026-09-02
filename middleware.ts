@@ -34,6 +34,9 @@ async function legacyRedirect(req: NextRequest): Promise<NextResponse | null> {
         const d = await r.json();
         if (Array.isArray(d) && d[0]) return to(`/ko/board/${d[0].board}/${d[0].id}`);
       } catch { /* DB 불통이면 아래 게시판 매핑으로 */ }
+      // DB에서 못 찾은 개별 글은 307(임시) — 일시적 DB 장애로 틀린 목적지가 브라우저에 영구 캐시되지 않게
+      const tbMapMiss: Record<string, string> = { sub6_1: 'notice', sub6_2: 'scholarship', sub6_3: 'events', sub6_4: 'gallery', sub6_5: 'archive' };
+      return to(tbMapMiss[tb] ? `/ko/board/${tbMapMiss[tb]}` : '/', false);
     }
     const tbMap: Record<string, string> = { sub6_1: 'notice', sub6_2: 'scholarship', sub6_3: 'events', sub6_4: 'gallery', sub6_5: 'archive' };
     if (tbMap[tb]) return to(`/ko/board/${tbMap[tb]}`);
@@ -110,6 +113,6 @@ export const config = {
   matcher: [
     '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)',
     // 옛 사이트 리다이렉트 대상 (점(.)이 들어간 경로는 위 일반 매처에서 제외되므로 명시)
-    '/bbs/:path*', '/v2/:path*', '/index.php', '/english/:path*',
+    '/bbs/:path*', '/v2/:path*', '/kor/:path*', '/index.php', '/english/:path*',
   ],
 };

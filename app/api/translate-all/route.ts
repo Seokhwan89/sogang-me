@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
-import { translateKoToEn, translateProvider } from '@/lib/translate';
+import { translateKoToEn, translateLongContent, translateProvider } from '@/lib/translate';
 
 export const maxDuration = 60;
 
@@ -21,27 +21,34 @@ export async function POST(req: Request) {
   const batch = Math.min(Number(body.batch) || 3, 8);
   const force = !!body.force;
   const board = body.board || null;
-  let done = 0; let remaining = 0; const errors: string[] = [];
+  // cursor: 이번 실행에서 이미 훑은 지점 뒤부터 조회 — 번역이 실패한 행이 매 반복 맨 앞에 다시
+  // 뽑혀 유료 호출이 무한 반복되는 것을 막는다 (다음 실행에서 처음부터 재시도)
+  const cursor = Number(body.cursor) || 0;
+  let done = 0; let remaining = 0; let last = cursor; const errors: string[] = [];
 
   if (target === 'posts') {
     let q = sb.from('posts').select('id,title_ko,title_en,content_ko,content_en,excerpt_ko,excerpt_en,category,category_en', { count: 'exact' });
     if (board) q = q.eq('board', board);
+    if (cursor) q = q.gt('id', cursor);
     q = force
       ? q.is('en_verified', null).order('id')
       : q.or('title_en.is.null,content_en.is.null,excerpt_en.is.null').order('id');
     const { data: rows, count } = await q.limit(batch);
     remaining = count || 0;
     for (const p of rows || []) {
+      last = Math.max(last, p.id);
       const fields: Record<string, string> = {};
       if (p.title_ko && (force || !p.title_en)) fields.title = p.title_ko;
-      if (p.content_ko && (force || !p.content_en)) fields.content = p.content_ko.slice(0, 12000);
       if (p.excerpt_ko && (force || !p.excerpt_en)) fields.excerpt = p.excerpt_ko;
       if (p.category && (force || !p.category_en)) fields.category = p.category;
+      const wantContent = p.content_ko && (force || !p.content_en);
       const out = Object.keys(fields).length ? await translateKoToEn(fields) : {};
-      if (out === null) { errors.push('post ' + p.id); continue; }
+      // 본문은 길이 제한 없이 문단 단위로 나눠 번역한다 — 12,000자에서 잘려 저장되던 문제 수정
+      const content = wantContent ? await translateLongContent(p.content_ko) : undefined;
+      if (out === null || (wantContent && content === null)) { errors.push('post ' + p.id); continue; }
       const upd: any = { en_verified: force ? new Date().toISOString() : null };
       if (fields.title) upd.title_en = out.title || p.title_ko;
-      if (fields.content) upd.content_en = out.content || p.content_ko;
+      if (wantContent) upd.content_en = content || p.content_ko;
       if (fields.excerpt) upd.excerpt_en = out.excerpt || p.excerpt_ko;
       if (fields.category) upd.category_en = out.category || p.category;
       if (!force) { upd.title_en = upd.title_en ?? p.title_en ?? p.title_ko; upd.content_en = upd.content_en ?? p.content_en ?? p.content_ko ?? ''; upd.excerpt_en = upd.excerpt_en ?? p.excerpt_en ?? p.excerpt_ko ?? ''; delete upd.en_verified; }
@@ -51,10 +58,12 @@ export async function POST(req: Request) {
     remaining = Math.max(0, remaining - done);
   } else if (target === 'faculty') {
     let q = sb.from('faculty').select('id,lab_ko,lab_en,research_ko,research_en,bio_ko,bio_en,name_en,name_ko', { count: 'exact' });
+    if (cursor) q = q.gt('id', cursor);
     q = force ? q.is('en_verified', null).order('id') : q.or('lab_en.is.null,name_en.is.null').order('id');
     const { data: rows, count } = await q.limit(batch);
     remaining = count || 0;
     for (const f of rows || []) {
+      last = Math.max(last, f.id);
       const fields: Record<string, string> = {};
       if (f.lab_ko && (force || !f.lab_en)) fields.lab = f.lab_ko;
       if (f.research_ko && (force || !f.research_en)) fields.research = f.research_ko;
@@ -74,16 +83,17 @@ export async function POST(req: Request) {
     }
     remaining = Math.max(0, remaining - done);
   } else if (target === 'pages') {
+    // content_ko가 없는 행은 번역할 것이 없는데도 매번 뽑혀 무한 반복되던 문제 — 국문 있는 행만 대상
     const { data: rows, count } = await sb.from('pages').select('slug,content_ko,content_en,title_ko,title_en', { count: 'exact' })
-      .is('content_en', null).limit(batch);
+      .is('content_en', null).not('content_ko', 'is', null).limit(batch);
     remaining = count || 0;
     for (const p of rows || []) {
       const out = await translateKoToEn({ content: p.content_ko || '', title: p.title_ko || '' });
-      if (out === null) { errors.push('page ' + p.slug); continue; }
-      const { error } = await sb.from('pages').update({ content_en: out.content || p.content_ko, title_en: p.title_en || out.title || null }).eq('slug', p.slug);
+      if (out === null || !out.content) { errors.push('page ' + p.slug); continue; }
+      const { error } = await sb.from('pages').update({ content_en: out.content, title_en: p.title_en || out.title || null }).eq('slug', p.slug);
       if (error) errors.push('page ' + p.slug); else done++;
     }
     remaining = Math.max(0, remaining - done);
   }
-  return NextResponse.json({ done, remaining, errors, provider: translateProvider() });
+  return NextResponse.json({ done, remaining, errors, cursor: last, provider: translateProvider() });
 }

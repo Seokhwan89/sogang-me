@@ -15,7 +15,14 @@ export default function TranslateButton({ pairs }: { pairs: [string, string][] }
         if (!r.ok) { setMsg(j.error || '실패'); setBusy(false); return; }
         for (const [ko, en] of pairs) {
           const el = form.elements.namedItem(en) as HTMLInputElement | HTMLTextAreaElement | null;
-          if (el && j.fields[ko]) { const setter = Object.getOwnPropertyDescriptor(el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype, 'value')!.set!; setter.call(el, j.fields[ko]); el.dispatchEvent(new Event('input', { bubbles: true })); }
+          if (!el || !j.fields[ko]) continue;
+          if (el.type === 'hidden') {
+            // RichEditor의 hidden input은 React가 통제하므로 전용 이벤트로 state·에디터를 함께 갱신
+            window.dispatchEvent(new CustomEvent('sg-editor-set', { detail: { name: en, value: j.fields[ko] } }));
+          } else {
+            const setter = Object.getOwnPropertyDescriptor(el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype, 'value')!.set!;
+            setter.call(el, j.fields[ko]); el.dispatchEvent(new Event('input', { bubbles: true }));
+          }
         }
         setMsg('번역 완료'); setBusy(false);
       }} className="btn-ghost !py-2 bg-white">{busy ? '번역 중…' : '🌐 AI 영문 번역'}</button>

@@ -37,7 +37,7 @@ export default async function EditFaculty({ params }: { params: { id: string } }
           <I n="lab_ko" l="연구실명 (한국어)" v={f?.lab_ko} /><I n="lab_en" l="Laboratory (English)" v={f?.lab_en} />
           <I n="lab_url" l="연구실 홈페이지" v={f?.lab_url} ph="https://" /><label className="block text-[13px]">건물<select name="building" defaultValue={curBuilding} className="input mt-1"><option value="">— 선택 —</option>{buildings.map((b) => <option key={b.code} value={b.code}>{b.ko} ({b.code})</option>)}</select></label>
           <label className="block text-[13px]">호실<input name="room" defaultValue={curRoom} placeholder="618" className="input mt-1" /><span className="block text-[11px] text-sg-steel mt-1">숫자만 입력 (국문 "리치과학관(R) 618호" / 영문 "New Ricci Hall (R) Room 618"로 자동 표기)</span></label>
-          <label className="block text-[13px]">연구 분야 (4대 기초전공)<select name="field" defaultValue={f?.field === 'chair' ? '' : f?.field || ''} className="input mt-1"><option value="">—</option>{areas.map((a) => <option key={a.id} value={a.id}>{a.ko}</option>)}</select></label>
+          <label className="block text-[13px]">연구 분야 (4대 기초전공)<select name="field" defaultValue={f?.field === 'chair' ? '' : f?.field || ''} className="input mt-1"><option value="">—</option>{areas.map((a) => <option key={a.id} value={a.id}>{a.ko}</option>)}</select>{f?.field === 'chair' && <span className="block text-[11px] text-sg-cardinal mt-1">※ 석좌→전임으로 바꿀 때는 연구 분야를 함께 선택하세요 (비워 두면 기초전공 연구실 표에 나오지 않습니다)</span>}</label>
           <I n="sort_order" l="정렬 순서 (작을수록 앞)" v={String(f?.sort_order ?? 100)} />
         </div>
       </div>

@@ -2,9 +2,12 @@ import { createPublicClient } from './supabase-server';
 import type { Post } from '@/components/PostCard';
 import { safeQuery } from './search';
 
+/** 조회 오류는 삼키지 않고 던진다 — ISR 재생성이 실패해야 직전 정상 페이지가 유지된다.
+ *  (조용히 빈 배열을 돌려주면 일시적 DB 장애 때 '빈 홈 화면'이 캐시로 굳는다) */
 const safe = async <T,>(fn: () => Promise<{ data: T | null; error: any }>, fallback: T): Promise<T> => {
-  try { const { data, error } = await fn(); if (error) { console.error(error.message); return fallback; } return data ?? fallback; }
-  catch (e: any) { console.error(e?.message); return fallback; }
+  const { data, error } = await fn();
+  if (error) { console.error(error.message); throw new Error(error.message); }
+  return data ?? fallback;
 };
 
 const homeBoards = ['notice', 'academic', 'research', 'award', 'alumni_news'] as const;
@@ -18,7 +21,7 @@ export async function getHomeData() {
       .order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(24) as any, []))),
     safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,thumbnail_url,images,created_at').eq('board', 'gallery').eq('published', true).order('created_at', { ascending: false }).limit(8) as any, []),
     safe<any[]>(() => sb.from('banners').select('*').eq('visible', true).order('sort_order') as any, []),
-    safe<any>(() => sb.from('site_settings').select('value').eq('key', 'home').single() as any, null),
+    safe<any>(() => sb.from('site_settings').select('value').eq('key', 'home').maybeSingle() as any, null),
     safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,attachments,created_at').eq('board', 'promo').eq('published', true).order('sort_order').order('created_at', { ascending: false }).limit(2) as any, []),
     safe<Post[]>(() => sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,video_url,category,category_en,sort_order,created_at').eq('board', 'videos').eq('published', true).order('sort_order').limit(4) as any, []),
   ]);
@@ -32,10 +35,13 @@ export async function getPosts(board: string, page = 1, per = 15, q = '') {
   let query = sb.from('posts').select('id,board,title_ko,title_en,excerpt_ko,excerpt_en,thumbnail_url,images,created_at,is_pinned,view_count,author,attachments,video_url,term,members,advisor,category,category_en,sort_order', { count: 'exact' })
     .eq('board', board).eq('published', true);
   const qs = safeQuery(q);
-  if (qs) query = query.or(`title_ko.ilike.%${qs}%,title_en.ilike.%${qs}%,content_ko.ilike.%${qs}%,members.ilike.%${qs}%`);
+  if (qs) query = query.or(`title_ko.ilike.%${qs}%,title_en.ilike.%${qs}%,content_ko.ilike.%${qs}%,content_en.ilike.%${qs}%,members.ilike.%${qs}%`);
   const from = (page - 1) * per;
   const { data, count, error } = await query.order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).range(from, from + per - 1);
-  if (error) { console.error(error.message); return { posts: [] as Post[], total: 0 }; }
+  if (error) {
+    if (error.code === 'PGRST103') return { posts: [] as Post[], total: 0 }; // 범위를 벗어난 페이지 번호 → 빈 목록
+    console.error(error.message); throw new Error(error.message);
+  }
   return { posts: (data || []) as Post[], total: count || 0 };
 }
 export async function getPost(id: number) {
@@ -45,9 +51,14 @@ export async function getPost(id: number) {
 }
 export async function getAdjacent(board: string, id: number, created: string) {
   const sb = createPublicClient();
+  // created_at이 같은 글(자정 날짜만 있는 legacy 글 다수)은 id로 순서를 가른다 — 동률 글이 이전/다음에서 빠지지 않게
   const [{ data: prev }, { data: next }] = await Promise.all([
-    sb.from('posts').select('id,title_ko,title_en').eq('board', board).eq('published', true).lt('created_at', created).order('created_at', { ascending: false }).limit(1),
-    sb.from('posts').select('id,title_ko,title_en').eq('board', board).eq('published', true).gt('created_at', created).order('created_at', { ascending: true }).limit(1),
+    sb.from('posts').select('id,title_ko,title_en').eq('board', board).eq('published', true)
+      .or(`created_at.lt."${created}",and(created_at.eq."${created}",id.lt.${id})`)
+      .order('created_at', { ascending: false }).order('id', { ascending: false }).limit(1),
+    sb.from('posts').select('id,title_ko,title_en').eq('board', board).eq('published', true)
+      .or(`created_at.gt."${created}",and(created_at.eq."${created}",id.gt.${id})`)
+      .order('created_at', { ascending: true }).order('id', { ascending: true }).limit(1),
   ]);
   return { prev: prev?.[0] || null, next: next?.[0] || null };
 }
@@ -76,13 +87,14 @@ export async function getReservations(facility: string, year: number, month: num
   const start = `${year}-${String(month).padStart(2, '0')}-01`;
   const endD = new Date(year, month, 0).getDate();
   const end = `${year}-${String(month).padStart(2, '0')}-${endD}`;
-  const { data } = await sb.from('reservations').select('*').eq('facility', facility).gte('date', start).lte('date', end).neq('status', 'rejected').order('date').order('start_time');
+  // 달력 표시에 필요한 컬럼만 — 연락처(contact)·소속(affiliation)은 개인정보라 공개 경로에서 조회하지 않는다 (schema_v8의 컬럼 grant와 세트)
+  const { data } = await sb.from('reservations').select('id,facility,date,start_time,end_time,user_name,purpose,status').eq('facility', facility).gte('date', start).lte('date', end).neq('status', 'rejected').order('date').order('start_time');
   return data || [];
 }
 
 /** 전임교수 중 연구실이 등록된 수 — '18개 연구실' 같은 문구를 DB와 연동하기 위해 사용합니다. */
 export async function getLabCount() {
   const sb = createPublicClient();
-  const { count } = await sb.from('faculty').select('id', { count: 'exact', head: true }).eq('is_emeritus', false).eq('published', true).not('lab_ko', 'is', null);
+  const { count } = await sb.from('faculty').select('id', { count: 'exact', head: true }).eq('is_emeritus', false).eq('published', true).not('lab_ko', 'is', null).or('field.is.null,field.neq.chair');
   return count || 0;
 }

@@ -3,7 +3,7 @@ import YouTube from './YouTube';
 import { type Post, fmtDate } from './PostCard';
 import { t, type Locale } from '@/lib/i18n';
 import { festivalCategories } from '@/lib/nav';
-import { youtubeThumb } from '@/lib/html';
+import { youtubeThumb, downloadUrl } from '@/lib/html';
 import { coverFor } from '@/lib/placeholder';
 
 const termLabel = (term: string | null | undefined, ko: boolean) => {
@@ -17,6 +17,7 @@ const groupBy = <T,>(arr: T[], key: (x: T) => string) => { const g: Record<strin
 /** 전공 홍보자료: large document cards with PDF download */
 export function PromoView({ posts, locale }: { posts: Post[]; locale: Locale }) {
   const ko = locale === 'ko';
+  if (!posts.length) return <p className="py-16 text-center text-sg-gray9 border border-dashed border-sg-line">{ko ? '등록된 자료가 없습니다.' : 'No materials yet.'}</p>;
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {posts.map((p) => { const file = (p.attachments || [])[0]; return (
@@ -27,7 +28,7 @@ export function PromoView({ posts, locale }: { posts: Post[]; locale: Locale }) 
             <p className="mt-2 text-[14px] text-sg-gray11 leading-relaxed line-clamp-4">{t(p, 'excerpt', locale)}</p>
             <div className="mt-auto pt-5 flex flex-wrap gap-2">
               <Link href={`/${locale}/board/promo/${p.id}`} className="btn-ghost !py-2 !px-4 !text-[13px]">{ko ? '자세히 보기' : 'Details'}</Link>
-              {file && <a href={file.url} download className="btn-primary !py-2 !px-4 !text-[13px]">PDF {ko ? '내려받기' : 'download'} ↓</a>}
+              {file && <a href={downloadUrl(file.url, (file as any).name)} download className="btn-primary !py-2 !px-4 !text-[13px]">PDF {ko ? '내려받기' : 'download'} ↓</a>}
               {file && <a href={file.url} target="_blank" rel="noreferrer" className="btn-ghost !py-2 !px-4 !text-[13px]">{ko ? '열람' : 'View'}</a>}
             </div>
           </div>
@@ -117,6 +118,7 @@ export function VideosView({ posts, locale }: { posts: Post[]; locale: Locale })
   const sorted = [...posts].sort((a, b) => (a.sort_order ?? 100) - (b.sort_order ?? 100) || a.id - b.id);
   const groups = groupBy(sorted, (p) => (ko ? p.category : (p as any).category_en || p.category) || (ko ? '기타' : 'Other'));
   const featured = sorted[0];
+  if (!sorted.length) return <p className="py-16 text-center text-sg-gray9 border border-dashed border-sg-line">{ko ? '등록된 영상이 없습니다.' : 'No videos yet.'}</p>;
   return (
     <div>
       {featured?.video_url && (

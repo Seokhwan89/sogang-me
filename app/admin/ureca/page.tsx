@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase-server';
 import { setUreca } from '@/app/admin/actions';
 import { urecaTerms } from '@/lib/nav';
+
+// 셀이 = + - @ 로 시작하면 엑셀이 수식으로 해석한다(수식 주입) — 앞에 '를 붙여 무력화
+const csvCell = (v: any) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`; return `"${s.replace(/"/g, '""')}"`; };
 export default async function UrecaAdmin({ searchParams }: { searchParams: { year?: string; term?: string } }) {
   const sb = createClient();
   let q = sb.from('ureca_applications').select('*').order('created_at', { ascending: false }).limit(2500);
@@ -10,7 +13,7 @@ export default async function UrecaAdmin({ searchParams }: { searchParams: { yea
   const rows = data || [];
   const years = Array.from(new Set(rows.map((r: any) => r.year))).sort().reverse();
   const tk = (t: string) => urecaTerms.find((x) => x.id === t)?.ko || t;
-  const csv = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(['연도,기간,이름,학번,현재학기,연락처,이메일,1지망,2지망,3지망,상태,신청일', ...rows.map((r: any) => [r.year, tk(r.term), r.name, r.student_id, r.semester, r.phone, r.email, ...[1, 2, 3].map((k) => { const c = (r.choices || []).find((c: any) => c.rank === k); return c ? `${c.lab}(${c.prof})` : ''; }), r.status, String(r.created_at).slice(0, 10)].map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'));
+  const csv = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(['연도,기간,이름,학번,현재학기,연락처,이메일,1지망,2지망,3지망,상태,신청일', ...rows.map((r: any) => [r.year, tk(r.term), r.name, r.student_id, r.semester, r.phone, r.email, ...[1, 2, 3].map((k) => { const c = (r.choices || []).find((c: any) => c.rank === k); return c ? `${c.lab}(${c.prof})` : ''; }), r.status, String(r.created_at).slice(0, 10)].map(csvCell).join(','))].join('\n'));
   return (<div>
     <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-2xl font-bold">URECA 인턴 지원 관리</h1><a href={csv} download={`ureca_${searchParams.year || 'all'}.csv`} className="btn-ghost !py-2 bg-white">CSV 내려받기</a></div>
     <div className="mt-4 flex flex-wrap gap-1 text-[13px]">

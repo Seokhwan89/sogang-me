@@ -8,7 +8,7 @@ import TableHeader from '@tiptap/extension-table-header';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Underline from '@tiptap/extension-underline';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { uploadToMedia } from './Uploader';
 
 /**
@@ -32,7 +32,25 @@ export default function RichEditor({ name, defaultValue = '', folder = 'posts', 
     content: defaultValue || '',
     editorProps: { attributes: { class: 'prose-sg focus:outline-none px-4 py-3', style: `min-height:${minHeight}px` } },
     onUpdate: ({ editor }) => setHtml(editor.getHTML()),
-  }, [mode === 'rich']);
+  });
+
+  // HTML 편집 탭에서 고친 내용을 일반 편집으로 돌아올 때 에디터에 반영한다 (수정분 유실 방지)
+  const toggleMode = () => {
+    if (mode === 'html' && editor) editor.commands.setContent(html || '', false);
+    setMode(mode === 'rich' ? 'html' : 'rich');
+  };
+
+  // AI 번역 버튼 등 외부에서 값을 주입할 때: 'sg-editor-set' 이벤트로 state와 에디터를 함께 갱신
+  useEffect(() => {
+    const onSet = (e: Event) => {
+      const d = (e as CustomEvent).detail as { name: string; value: string };
+      if (d?.name !== name) return;
+      setHtml(d.value);
+      editor?.commands.setContent(d.value || '', false);
+    };
+    window.addEventListener('sg-editor-set', onSet);
+    return () => window.removeEventListener('sg-editor-set', onSet);
+  }, [editor, name]);
 
   const B = ({ on, active, title, children }: any) => (
     <button type="button" onMouseDown={(e) => { e.preventDefault(); on(); }} title={title}
@@ -84,7 +102,7 @@ export default function RichEditor({ name, defaultValue = '', folder = 'posts', 
           </>
         )}
         <span className="flex-1" />
-        <button type="button" onClick={() => setMode(mode === 'rich' ? 'html' : 'rich')} className="px-2.5 py-1.5 text-[12px] border border-sg-line bg-white">
+        <button type="button" onClick={toggleMode} className="px-2.5 py-1.5 text-[12px] border border-sg-line bg-white">
           {mode === 'rich' ? 'HTML 편집' : '일반 편집으로'}
         </button>
       </div>
