@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Logo from './Logo';
-import { nav, label } from '@/lib/nav';
+import { nav, label, isExternal } from '@/lib/nav';
 import type { Locale } from '@/lib/i18n';
 
 function Flag({ code }: { code: 'ko' | 'en' }) {
@@ -67,7 +67,9 @@ export default function Header({ locale }: { locale: Locale }) {
           {nav.map((item) => (
             <div key={item.id}>
               <p className="font-bold text-[15px] text-sg-cardinal mb-3">{label(item, locale)}</p>
-              <ul className="space-y-1.5">{item.sub?.map((s) => <li key={s.id}><Link href={`/${locale}${s.href}`} className="block text-[14px] text-sg-gray11 hover:text-sg-ink hover:underline underline-offset-4">{label(s, locale)}</Link></li>)}</ul>
+              <ul className="space-y-1.5">{item.sub?.map((s) => <li key={s.id}>{isExternal(s.href)
+                ? <a href={s.href} target="_blank" rel="noreferrer" className="block text-[14px] text-sg-gray11 hover:text-sg-ink hover:underline underline-offset-4">{label(s, locale)} ↗</a>
+                : <Link href={`/${locale}${s.href}`} className="block text-[14px] text-sg-gray11 hover:text-sg-ink hover:underline underline-offset-4">{label(s, locale)}</Link>}</li>)}</ul>
             </div>
           ))}
         </div>
@@ -79,7 +81,9 @@ export default function Header({ locale }: { locale: Locale }) {
               <button className="w-full flex items-center justify-between px-5 py-4 text-left text-[16px] font-semibold" onClick={() => setMobile(mobile === item.id ? null : item.id)} aria-expanded={mobile === item.id}>
                 {label(item, locale)}<span className={`text-sg-gray9 transition-transform ${mobile === item.id ? 'rotate-45' : ''}`}>+</span>
               </button>
-              {mobile === item.id && item.sub && <ul className="bg-sg-mist pb-2">{item.sub.map((s) => <li key={s.id}><Link href={`/${locale}${s.href}`} className="block px-8 py-2.5 text-[15px]">{label(s, locale)}</Link></li>)}</ul>}
+              {mobile === item.id && item.sub && <ul className="bg-sg-mist pb-2">{item.sub.map((s) => <li key={s.id}>{isExternal(s.href)
+                ? <a href={s.href} target="_blank" rel="noreferrer" className="block px-8 py-2.5 text-[15px]">{label(s, locale)} ↗</a>
+                : <Link href={`/${locale}${s.href}`} className="block px-8 py-2.5 text-[15px]">{label(s, locale)}</Link>}</li>)}</ul>}
             </div>
           ))}
         </div>

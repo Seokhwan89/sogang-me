@@ -13,6 +13,7 @@ export default function Footer({ locale }: { locale: Locale }) {
           <a href="https://www.sogang.ac.kr" target="_blank" rel="noreferrer" className="hover:underline">{ko ? '서강대학교' : 'Sogang University'}</a>
           <a href="https://admission.sogang.ac.kr" target="_blank" rel="noreferrer" className="hover:underline">{ko ? '입학처' : 'Admissions'}</a>
           <a href="https://gradsch.sogang.ac.kr" target="_blank" rel="noreferrer" className="hover:underline">{ko ? '대학원' : 'Graduate School'}</a>
+          <a href="http://bk21me.sogang.ac.kr" target="_blank" rel="noreferrer" className="hover:underline">{ko ? 'BK21 교육연구팀' : 'BK21 FOUR'}</a>
           <a href="https://saint.sogang.ac.kr" target="_blank" rel="noreferrer" className="hover:underline">SAINT</a>
           <a href="https://library.sogang.ac.kr" target="_blank" rel="noreferrer" className="hover:underline">{ko ? '로욜라도서관' : 'Loyola Library'}</a>
         </div>

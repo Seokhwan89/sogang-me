@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 고정 페이지 (홈 + 내비게이션 전체)
   push('', { changeFrequency: 'daily', priority: 1 });
-  nav.flatMap((n) => n.sub || []).forEach((s) => push(s.href, { changeFrequency: 'weekly', priority: 0.8 }));
+  nav.flatMap((n) => n.sub || []).filter((s) => !s.href.startsWith('http')).forEach((s) => push(s.href, { changeFrequency: 'weekly', priority: 0.8 }));
   push('/reservation', { changeFrequency: 'weekly', priority: 0.5 });
 
   const sb = createPublicClient();

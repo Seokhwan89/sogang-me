@@ -31,6 +31,7 @@ export const nav: NavItem[] = [
     { id: 'calendar', ko: '학사일정', en: 'Academic Calendar', href: '/graduate/calendar' },
     { id: 'areas', ko: '기초전공분야', en: 'Research Areas', href: '/graduate/areas' },
     { id: 'groups', ko: '융합 및 응용연구 그룹', en: 'Convergence Research Groups', href: '/graduate/groups' },
+    { id: 'bk21', ko: 'BK21 교육연구팀', en: 'BK21 FOUR Program', href: 'http://bk21me.sogang.ac.kr' },   // 외부 사이트 (옛 홈페이지 상단바에 있던 링크)
   ]},
   { id: 'industry', ko: '산학협력', en: 'Industry', href: '/industry/samsung', sub: [
     { id: 'samsung', ko: '삼성전자 반도체 트랙', en: 'Samsung Semiconductor Track', href: '/industry/samsung' },
@@ -56,6 +57,8 @@ export const nav: NavItem[] = [
   ]},
 ];
 export const label = (item: { ko: string; en: string }, l: Locale) => (l === 'en' ? item.en : item.ko);
+/** 외부 링크(BK21 등)는 로케일 접두어 없이 새 탭으로 연다. */
+export const isExternal = (href: string) => href.startsWith('http');
 export const boards = ['notice', 'academic', 'research', 'award', 'scholarship', 'major', 'gallery', 'archive', 'events', 'alumni_news', 'promo', 'capstone', 'festival', 'videos'] as const;
 /** Which nav section/sub a board belongs to (for hero + tabs). */
 export const boardSection: Record<string, [string, string]> = {

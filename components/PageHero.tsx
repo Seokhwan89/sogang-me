@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { nav, label } from '@/lib/nav';
+import { nav, label, isExternal } from '@/lib/nav';
 import { T, type Locale } from '@/lib/i18n';
 import { sectionHero } from '@/content/assets';
 import HeroDecor from './HeroDecor';
@@ -28,7 +28,9 @@ export default function PageHero({ locale, section, current, title, image }: { l
       {sec?.sub && (
         <div className="border-b border-sg-line bg-white sticky top-[80px] z-30">
           <div className="container-site flex gap-1 overflow-x-auto no-scrollbar">
-            {sec.sub.map((s) => (
+            {sec.sub.map((s) => isExternal(s.href) ? (
+              <a key={s.id} href={s.href} target="_blank" rel="noreferrer" className="whitespace-nowrap px-4 py-3.5 text-[15px] border-b-[3px] -mb-px border-transparent text-sg-gray11 hover:text-sg-ink">{label(s, locale)} ↗</a>
+            ) : (
               <Link key={s.id} href={`/${locale}${s.href}`} className={`whitespace-nowrap px-4 py-3.5 text-[15px] border-b-[3px] -mb-px ${s.id === current ? 'border-sg-cardinal text-sg-cardinal font-bold' : 'border-transparent text-sg-gray11 hover:text-sg-ink'}`}>{label(s, locale)}</Link>
             ))}
           </div>
