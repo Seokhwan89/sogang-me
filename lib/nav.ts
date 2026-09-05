@@ -75,9 +75,10 @@ export const urecaTerms = [
   { id: 'fall', ko: '가을학기', en: 'Fall semester' }, { id: 'winter', ko: '겨울방학', en: 'Winter break' },
 ];
 export type Board = (typeof boards)[number];
+/** 사용 빈도순 (학과사무실 요청): 학과회의실 → 세미나실 → 제도실 → 공용서버. 첫 항목이 기본 선택. */
 export const facilities = [
-  { id: 'seminar', ko: '세미나실', en: 'Seminar room' },
   { id: 'meeting', ko: '학과회의실', en: 'Meeting room' },
+  { id: 'seminar', ko: '세미나실', en: 'Seminar room' },
   { id: 'drafting', ko: '제도실', en: 'Drafting room' },
   { id: 'server1', ko: '공용서버 1', en: 'Shared server 1' },
   { id: 'server2', ko: '공용서버 2', en: 'Shared server 2' },

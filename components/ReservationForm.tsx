@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { facilities } from '@/lib/nav';
+import { START_SLOTS, END_SLOTS } from '@/lib/reservation';
 import type { Locale } from '@/lib/i18n';
 
 const todayStr = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
@@ -39,8 +40,9 @@ export default function ReservationForm({ locale, facility, date }: { locale: Lo
     <form onSubmit={submit} onChange={(e) => check(e.currentTarget)} className="grid gap-4 sm:grid-cols-2 border border-sg-line p-6 bg-white">
       <label className="text-[13px]"><span className="eyebrow">{ko ? '시설' : 'Facility'}</span><select name="facility" defaultValue={facility} className="input mt-1">{facilities.map((f) => <option key={f.id} value={f.id}>{ko ? f.ko : f.en}</option>)}</select></label>
       <label className="text-[13px]"><span className="eyebrow">{ko ? '날짜' : 'Date'}</span><input name="date" type="date" required min={todayStr()} defaultValue={date} className="input mt-1" /></label>
-      <label className="text-[13px]"><span className="eyebrow">{ko ? '시작' : 'Start'}</span><input name="start_time" type="time" required step={1800} className="input mt-1" /></label>
-      <label className="text-[13px]"><span className="eyebrow">{ko ? '종료' : 'End'}</span><input name="end_time" type="time" required step={1800} className="input mt-1" /></label>
+      {/* 30분 단위만 선택 가능 (학과사무실 요청) */}
+      <label className="text-[13px]"><span className="eyebrow">{ko ? '시작' : 'Start'}</span><select name="start_time" required defaultValue="" className="input mt-1"><option value="" disabled>{ko ? '선택' : 'Select'}</option>{START_SLOTS.map((t) => <option key={t} value={t}>{t}</option>)}</select></label>
+      <label className="text-[13px]"><span className="eyebrow">{ko ? '종료' : 'End'}</span><select name="end_time" required defaultValue="" className="input mt-1"><option value="" disabled>{ko ? '선택' : 'Select'}</option>{END_SLOTS.map((t) => <option key={t} value={t}>{t}</option>)}</select></label>
       <label className="text-[13px]"><span className="eyebrow">{ko ? '이름 (소속)' : 'Name (lab)'}</span><input name="user_name" required className="input mt-1" placeholder={ko ? '홍길동 (OO연구실)' : 'Name (lab)'} /></label>
       <label className="text-[13px]"><span className="eyebrow">{ko ? '연락처' : 'Contact'}</span><input name="contact" required className="input mt-1" placeholder={ko ? '이메일 또는 전화' : 'Email or phone'} /></label>
       <label className="text-[13px] sm:col-span-2"><span className="eyebrow">{ko ? '사용 목적' : 'Purpose'}</span><input name="purpose" className="input mt-1" /></label>

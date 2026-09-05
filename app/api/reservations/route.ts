@@ -4,6 +4,7 @@ import { notifyAdmin } from '@/lib/notify';
 import { facilities } from '@/lib/nav';
 import { escapeHtml as esc } from '@/lib/html';
 import { allow, clientIp } from '@/lib/ratelimit';
+import { isHalfHour } from '@/lib/reservation';
 
 const today = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST 기준 오늘
 
@@ -32,6 +33,7 @@ export async function POST(req: Request) {
   };
   if (!row.facility || !row.date || !row.start_time || !row.end_time || !row.user_name || !row.contact)
     return NextResponse.json({ error: '필수 항목이 비어 있습니다.' }, { status: 400 });
+  if (!isHalfHour(row.start_time) || !isHalfHour(row.end_time)) return NextResponse.json({ error: '시간은 30분 단위로만 예약할 수 있습니다.' }, { status: 400 });
   if (row.start_time >= row.end_time) return NextResponse.json({ error: '종료 시간이 시작 시간보다 늦어야 합니다.' }, { status: 400 });
   if (row.date < today()) return NextResponse.json({ error: '지난 날짜는 예약할 수 없습니다.' }, { status: 400 });
 

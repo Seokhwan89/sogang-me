@@ -6,6 +6,8 @@ import { translateKoToEn } from '@/lib/translate';
 import { toHtml } from '@/lib/html';
 import { researchGroupDefs } from '@/lib/groups';
 import { buildingOf } from '@/lib/buildings';
+import { facilities } from '@/lib/nav';
+import { isHalfHour, isDateStr, repeatDates, REPEAT_MAX, type Repeat } from '@/lib/reservation';
 
 import { adminBase as base } from '@/lib/admin';
 
@@ -204,22 +206,72 @@ export async function resetPage(fd: FormData) {
   const sb = await admin(); await sb.from('pages').delete().eq('slug', str(fd, 'slug')); revalidatePath('/', 'layout'); redirect(`${base()}/pages`);
 }
 
+/* ───────── 시설 예약 (관리자) ─────────
+ * 화면 상태(시설·연월·날짜)는 쿼리스트링으로 유지한다 — 한 건 등록 후에도 같은 시설·날짜가 그대로 남게. */
+const safeBack = (s: string) => (s.startsWith('/') && !s.startsWith('//') ? s : `${base()}/reservations`);
+const resvUrl = (facility: string, date: string, extra: Record<string, string> = {}) => {
+  const q = new URLSearchParams({ f: facility, y: date.slice(0, 4), m: String(Number(date.slice(5, 7))), d: date, ...extra });
+  return `${base()}/reservations?${q.toString()}`;
+};
+/** prev를 주면(수정) 30분 단위가 아닌 기존 시각도 '그대로 두는 것'은 허용한다 — 옛 사이트에서 이관된 09:15 같은 행의 이름만 고칠 때 시간이 바뀌지 않게. */
+function readResv(fd: FormData, prev?: { start_time: string; end_time: string } | null) {
+  const r = { facility: str(fd, 'facility'), date: str(fd, 'date'), start_time: str(fd, 'start_time').slice(0, 5), end_time: str(fd, 'end_time').slice(0, 5), user_name: str(fd, 'user_name').trim(), purpose: nul(str(fd, 'purpose')) };
+  if (!facilities.some((f) => f.id === r.facility)) throw new Error('시설을 선택해 주세요.');
+  if (!isDateStr(r.date) || !r.start_time || !r.end_time || !r.user_name) throw new Error('필수 항목이 비어 있습니다.');
+  const kept = (v: string, p?: string) => !!p && v === p.slice(0, 5);
+  if ((!isHalfHour(r.start_time) && !kept(r.start_time, prev?.start_time)) || (!isHalfHour(r.end_time) && !kept(r.end_time, prev?.end_time))) throw new Error('시간은 30분 단위로 입력해 주세요.');
+  if (r.start_time >= r.end_time) throw new Error('종료 시간이 시작 시간보다 늦어야 합니다.');
+  return r;
+}
+const fmtClash = (c: any) => `${c.date ? c.date.slice(5) + ' ' : ''}${c.start_time.slice(0, 5)}~${c.end_time.slice(0, 5)} ${c.user_name}`;
+
 export async function setReservation(fd: FormData) {
   const sb = await admin(); const id = Number(str(fd, 'id')); const status = str(fd, 'status');
-  if (status === 'delete') await sb.from('reservations').delete().eq('id', id); else await sb.from('reservations').update({ status }).eq('id', id);
-  revalidatePath('/', 'layout'); redirect(`${base()}/reservations`);
+  if (status === 'delete') await sb.from('reservations').delete().eq('id', id);
+  else if (['approved', 'rejected', 'pending'].includes(status)) await sb.from('reservations').update({ status }).eq('id', id);
+  revalidatePath('/', 'layout'); redirect(safeBack(str(fd, 'back')));
 }
+
+/** 직접 등록(즉시 확정). 반복(매주/격주)이면 종료일까지 여러 날짜를 한 번에 넣고, 겹치는 날짜만 건너뛰어 결과를 알려준다. */
 export async function addReservation(fd: FormData) {
   const sb = await admin();
-  const row = { facility: str(fd, 'facility'), date: str(fd, 'date'), start_time: str(fd, 'start_time'), end_time: str(fd, 'end_time'), user_name: str(fd, 'user_name'), purpose: nul(str(fd, 'purpose')), status: 'approved' };
-  if (!row.facility || !row.date || !row.start_time || !row.end_time || !row.user_name) throw new Error('필수 항목이 비어 있습니다.');
-  if (row.start_time >= row.end_time) throw new Error('종료 시간이 시작 시간보다 늦어야 합니다.');
-  const { data: clash } = await sb.from('reservations').select('start_time,end_time,user_name')
-    .eq('facility', row.facility).eq('date', row.date).neq('status', 'rejected')
-    .lt('start_time', row.end_time).gt('end_time', row.start_time).limit(3);
-  if (clash && clash.length) throw new Error(`이미 예약된 시간과 겹칩니다: ${clash.map((c: any) => `${c.start_time.slice(0, 5)}~${c.end_time.slice(0, 5)} ${c.user_name}`).join(', ')}`);
-  const { error } = await sb.from('reservations').insert(row);
-  if (error) throw new Error(error.message); revalidatePath('/', 'layout'); redirect(`${base()}/reservations`);
+  const r = readResv(fd);
+  const repeat = (['weekly', 'biweekly'].includes(str(fd, 'repeat')) ? str(fd, 'repeat') : 'none') as Repeat;
+  const untilRaw = str(fd, 'repeat_until');
+  const until = isDateStr(untilRaw) ? untilRaw : null;   // 형식이 아니면 반복 없이 1건만
+  const dates = repeatDates(r.date, repeat, until);
+  const { data: clashes } = await sb.from('reservations').select('date,start_time,end_time,user_name')
+    .eq('facility', r.facility).in('date', dates).neq('status', 'rejected')
+    .lt('start_time', r.end_time).gt('end_time', r.start_time).order('date');
+  const clashDates = new Set((clashes || []).map((c: any) => c.date));
+  const rows = dates.filter((d) => !clashDates.has(d)).map((d) => ({ ...r, date: d, status: 'approved' }));
+  if (rows.length) { const { error } = await sb.from('reservations').insert(rows); if (error) throw new Error(error.message); }
+  let note = rows.length ? `${rows.length}건 등록했습니다.` : '';
+  if (clashDates.size) note += `${note ? ' ' : ''}겹치는 예약이 있어 건너뜀: ${(clashes || []).map(fmtClash).join(', ')}`;
+  if (repeat !== 'none' && dates.length >= REPEAT_MAX) note += ` (반복은 최대 ${REPEAT_MAX}건까지)`;
+  revalidatePath('/', 'layout');
+  redirect(resvUrl(r.facility, r.date, { note }));
+}
+
+/** 수정 모드: 승인된 예약도 삭제 없이 시설·날짜·시간·이름·목적을 고친다 (겹침 검사는 자기 자신 제외). */
+export async function updateReservation(fd: FormData) {
+  const sb = await admin(); const id = Number(str(fd, 'id'));
+  if (!id) throw new Error('잘못된 요청입니다.');
+  const { data: prev } = await sb.from('reservations').select('start_time,end_time').eq('id', id).maybeSingle();
+  if (!prev) throw new Error('예약을 찾을 수 없습니다.');
+  const r = readResv(fd, prev);
+  const status = ['approved', 'rejected', 'pending'].includes(str(fd, 'status')) ? str(fd, 'status') : undefined;
+  // 거절로 바꾸는 저장은 자리를 차지하지 않으므로 겹침 검사를 하지 않는다 (겹친 신청을 거절하는 게 바로 그 용도)
+  if (status !== 'rejected') {
+    const { data: clash } = await sb.from('reservations').select('date,start_time,end_time,user_name')
+      .eq('facility', r.facility).eq('date', r.date).neq('status', 'rejected').neq('id', id)
+      .lt('start_time', r.end_time).gt('end_time', r.start_time).limit(3);
+    if (clash && clash.length) redirect(resvUrl(r.facility, r.date, { edit: String(id), note: `저장하지 않았습니다 — 겹치는 예약: ${clash.map(fmtClash).join(', ')}` }));
+  }
+  const { error } = await sb.from('reservations').update({ ...r, ...(status ? { status } : {}) }).eq('id', id);
+  if (error) throw new Error(error.message);
+  revalidatePath('/', 'layout');
+  redirect(resvUrl(r.facility, r.date, { note: '수정했습니다.' }));
 }
 
 export async function saveSettings(fd: FormData) {
